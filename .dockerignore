@@ -1,0 +1,6 @@
+*.json
+**/*.json
+trivy
+trivy/
+Dockerfile
+.gitignore
