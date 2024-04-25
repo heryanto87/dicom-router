@@ -10,6 +10,25 @@ ALLOWED_EXTENSIONS = {'dcm', 'zip'}
 def allowed_file(filename):
   return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def generate_metadata(file_dcm, pathname):
+  return {
+    'patient_id': str(file_dcm.PatientID),
+    'patient_name': str(file_dcm.PatientName),
+    'study_id': str(file_dcm['00200010'].value), # Study ID
+    'study_date': str(file_dcm.StudyDate),
+    'study_time': str(file_dcm.StudyTime),
+    'study_description': str(file_dcm.StudyDescription),
+    'series_id': str(file_dcm.SeriesNumber),
+    'series_date': str(file_dcm.SeriesDate), # sometimes: Error reading DICOM file: 'FileDataset' object has no attribute 'SeriesDate'
+    # 'series_date': str(file_dcm["00080021"].value),
+    'series_time': str(file_dcm.SeriesTime),
+    'series_description': str(file_dcm.SeriesDescription),
+    'instance_number': str(file_dcm.InstanceNumber),
+    'body_part_examined': str(file_dcm.BodyPartExamined),
+    'modality': str(file_dcm.Modality),
+    'path': str(pathname)
+  }
+
 def handle_file_zip(pathname):
   try:
     with zipfile.ZipFile(pathname, 'r') as zip_ref:
@@ -42,14 +61,7 @@ def handle_file_zip(pathname):
 def handle_file_dcm(pathname):
   try:
     file_dcm = dcmread(pathname, force=True)
-    dcm_metadata = {
-      'patient_id': str(file_dcm.PatientID),
-      'patient_name': str(file_dcm.PatientName),
-      'study_date': str(file_dcm.StudyDate),
-      'body_part_examined': str(file_dcm.BodyPartExamined),
-      'modality': str(file_dcm.Modality),
-      'path': str(pathname)
-    }
+    dcm_metadata = generate_metadata(file_dcm, pathname)
     collection = connect_mongodb()
     collection.insert_one(dcm_metadata)
     print(f"Successfully insert {pathname}")
@@ -75,14 +87,7 @@ def read_first_dicom_from_series(zip_path):
     with zip_ref.open(first_dcm_file) as dcm_data:
       try:
         file_dcm = dcmread(dcm_data, force=True)
-        dcm_metadata = {
-          'patient_id': str(file_dcm.PatientID),
-          'patient_name': str(file_dcm.PatientName),
-          'study_date': str(file_dcm.StudyDate),
-          'body_part_examined': str(file_dcm.BodyPartExamined),
-          'modality': str(file_dcm.Modality),
-          'path': str(zip_path)
-        }
+        dcm_metadata = generate_metadata(file_dcm, zip_path)
         collection = connect_mongodb()
         collection.insert_one(dcm_metadata)
         print("Successfully insert one dicom metadata")
