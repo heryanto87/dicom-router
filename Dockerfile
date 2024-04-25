@@ -11,7 +11,7 @@ SHELL ["/bin/bash", "--login", "-c"]
 # Create the environment:
 COPY ./conda_env/conda-unix.yml .
 COPY . .
-ADD router.conf.template router.conf
+ADD router.conf router.conf
 
 # Install the environment
 RUN conda env create -n dicom-router -f conda-unix.yml
@@ -35,10 +35,13 @@ USER router
 RUN echo "conda activate dicom-router" > ~/.bashrc
 
 EXPOSE 11112
-ENV PORT=11112
+EXPOSE 8081
 
 # The code to run when container is started:
 # Ensure that the copied files are owned by the non-root user
 COPY --chown=router:dicom main.py entrypoint.sh ./
+
+# Define the shared folder path
+VOLUME ["/shared"]
 
 ENTRYPOINT ["./entrypoint.sh"]

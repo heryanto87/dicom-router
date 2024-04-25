@@ -130,9 +130,7 @@ def sync():
     if not os.path.isdir(folder_path):
       raise ValueError(f"Invalid folder path: {folder_path}")
 
-    files = []
     for filename in os.listdir(folder_path):
-      # Check if it's a file (not a directory) using os.path.isfile()
       if os.path.isfile(os.path.join(folder_path, filename)):
         dicom_push(f'{folder_path}/{filename}')
 
