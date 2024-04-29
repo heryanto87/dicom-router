@@ -14,18 +14,18 @@ def generate_metadata(file_dcm, pathname):
   return {
     'patient_id': str(file_dcm.PatientID) if hasattr(file_dcm, 'PatientID') else None,
     'patient_name': str(file_dcm.PatientName) if hasattr(file_dcm, 'PatientName') else None,
-    'study_id': str(file_dcm['00200010'].value) if hasattr(file_dcm, '00200010') else None, # Study ID
+    'study_id': str(file_dcm[0x0020, 0x0010].value) if [0x0020, 0x0010] in file_dcm else None, # Study ID
     'study_date': str(file_dcm.StudyDate) if hasattr(file_dcm, 'StudyDate') else None,
     'study_time': str(file_dcm.StudyTime) if hasattr(file_dcm, 'StudyTime') else None,
     'study_description': str(file_dcm.StudyDescription) if hasattr(file_dcm, 'StudyDescription') else None,
     'series_id': str(file_dcm.SeriesNumber) if hasattr(file_dcm, 'SeriesNumber') else None,
-    'series_date': str(file_dcm.SeriesDate) if hasattr(file_dcm, 'SeriesDate') else str(file_dcm['00080021'].value) if hasattr(file_dcm, '00080021') else None,
+    'series_date': str(file_dcm.SeriesDate) if hasattr(file_dcm, 'SeriesDate') else [0x0008, 0x0021] if [0x0008, 0x0021] in file_dcm else None,
     'series_time': str(file_dcm.SeriesTime) if hasattr(file_dcm, 'SeriesTime') else None,
     'series_description': str(file_dcm.SeriesDescription) if hasattr(file_dcm, 'SeriesDescription') else None,
     'instance_number': str(file_dcm.InstanceNumber) if hasattr(file_dcm, 'InstanceNumber') else None,
     'body_part_examined': str(file_dcm.BodyPartExamined) if hasattr(file_dcm, 'BodyPartExamined') else None,
     'modality': str(file_dcm.Modality) if hasattr(file_dcm, 'Modality') else None,
-    'path': str(pathname) if hasattr(file_dcm, 'path') else None
+    'path': str(pathname)
   }
 
 def handle_file_zip(pathname):
