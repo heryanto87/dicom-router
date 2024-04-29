@@ -12,21 +12,20 @@ def allowed_file(filename):
 
 def generate_metadata(file_dcm, pathname):
   return {
-    'patient_id': str(file_dcm.PatientID),
-    'patient_name': str(file_dcm.PatientName),
-    'study_id': str(file_dcm['00200010'].value), # Study ID
-    'study_date': str(file_dcm.StudyDate),
-    'study_time': str(file_dcm.StudyTime),
-    'study_description': str(file_dcm.StudyDescription),
-    'series_id': str(file_dcm.SeriesNumber),
-    'series_date': str(file_dcm.SeriesDate), # sometimes: Error reading DICOM file: 'FileDataset' object has no attribute 'SeriesDate'
-    # 'series_date': str(file_dcm["00080021"].value),
-    'series_time': str(file_dcm.SeriesTime),
-    'series_description': str(file_dcm.SeriesDescription),
-    'instance_number': str(file_dcm.InstanceNumber),
-    'body_part_examined': str(file_dcm.BodyPartExamined),
-    'modality': str(file_dcm.Modality),
-    'path': str(pathname)
+    'patient_id': str(file_dcm.PatientID) if hasattr(file_dcm, 'PatientID') else None,
+    'patient_name': str(file_dcm.PatientName) if hasattr(file_dcm, 'PatientName') else None,
+    'study_id': str(file_dcm['00200010'].value) if hasattr(file_dcm, '00200010') else None, # Study ID
+    'study_date': str(file_dcm.StudyDate) if hasattr(file_dcm, 'StudyDate') else None,
+    'study_time': str(file_dcm.StudyTime) if hasattr(file_dcm, 'StudyTime') else None,
+    'study_description': str(file_dcm.StudyDescription) if hasattr(file_dcm, 'StudyDescription') else None,
+    'series_id': str(file_dcm.SeriesNumber) if hasattr(file_dcm, 'SeriesNumber') else None,
+    'series_date': str(file_dcm.SeriesDate) if hasattr(file_dcm, 'SeriesDate') else str(file_dcm['00080021'].value) if hasattr(file_dcm, '00080021') else None,
+    'series_time': str(file_dcm.SeriesTime) if hasattr(file_dcm, 'SeriesTime') else None,
+    'series_description': str(file_dcm.SeriesDescription) if hasattr(file_dcm, 'SeriesDescription') else None,
+    'instance_number': str(file_dcm.InstanceNumber) if hasattr(file_dcm, 'InstanceNumber') else None,
+    'body_part_examined': str(file_dcm.BodyPartExamined) if hasattr(file_dcm, 'BodyPartExamined') else None,
+    'modality': str(file_dcm.Modality) if hasattr(file_dcm, 'Modality') else None,
+    'path': str(pathname) if hasattr(file_dcm, 'path') else None
   }
 
 def handle_file_zip(pathname):
