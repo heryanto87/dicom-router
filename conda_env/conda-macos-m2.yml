@@ -26,6 +26,7 @@ dependencies:
   - tzdata=2022g
   - wheel=0.38.4
   - xz=5.2.6
+  - flask_cors
   - pip:
       - blinker==1.6.3
       - cachetools==5.3.1
