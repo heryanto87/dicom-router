@@ -10,7 +10,7 @@ from datetime import datetime
 ALLOWED_EXTENSIONS = {'dcm', 'zip'}
 
 _client = client_mongodb()
-_db = _client["pacs_live"]
+_db = _client["pacs-live"]
 
 def allowed_file(filename):
   return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
