@@ -50,7 +50,8 @@ def handle_file_dcm(pathname):
       'modality': str(file_dcm.Modality),
       'path': str(pathname)
     }
-    collection = connect_mongodb()
+    db = connect_mongodb()
+    collection = db['dicom_metadata']
     collection.insert_one(dcm_metadata)
     print(f"Successfully insert {pathname}")
   except InvalidDicomError:
@@ -83,7 +84,8 @@ def read_first_dicom_from_series(zip_path):
           'modality': str(file_dcm.Modality),
           'path': str(zip_path)
         }
-        collection = connect_mongodb()
+        db = connect_mongodb()
+        collection = db['dicom_metadata']
         collection.insert_one(dcm_metadata)
         print("Successfully insert one dicom metadata")
       except InvalidDicomError:

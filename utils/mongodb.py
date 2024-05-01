@@ -7,5 +7,5 @@ def connect_mongodb():
   client = MongoClient(config.mongodb_url)
 
   db = client['pacs']
-  collection = db['dicom_metadata']
-  return collection
+  # collection = db['dicom_metadata']
+  return db
