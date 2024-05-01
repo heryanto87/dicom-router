@@ -108,7 +108,8 @@ def watch_directory():
 
 def flask_server():
   LOGGER.info(f'[Init] - Starting Flask service on port {config.flask_port}')
-  app.run(host="0.0.0.0",port=config.flask_port)
+  if __name__ == '__main__':
+    app.run(host="0.0.0.0",port=config.flask_port)
 
 # Start the thread for watching the directory
 watch_thread = threading.Thread(target=watch_directory)
