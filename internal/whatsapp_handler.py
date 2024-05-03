@@ -60,7 +60,7 @@ def send_to_whatsapp(bearer_token):
   payload = {
     "messaging_product": "whatsapp",
     "recipient_type": "individual",
-    "to": "6282269260707",
+    "to": "6281238009823",
     "type": "template",
     "template": {
         "name": "template_halosis",
@@ -87,5 +87,3 @@ def send_to_whatsapp(bearer_token):
     print("whatsapp message has been sent!")
   else:
     print("error: ", response.json())
-
-send()
