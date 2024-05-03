@@ -44,4 +44,6 @@ COPY --chown=router:dicom main.py entrypoint.sh ./
 # Define the shared folder path
 VOLUME ["/shared"]
 
+RUN chmod +x entrypoint.sh
+
 ENTRYPOINT ["./entrypoint.sh"]

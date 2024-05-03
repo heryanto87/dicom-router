@@ -3,9 +3,12 @@ from utils import config
 
 config.init()
 
-def connect_mongodb():
-  client = MongoClient(config.mongodb_url)
+def connect_mongodb(coll, client=None):
+  if not client:
+      client = MongoClient(config.mongodb_url)
+  db = client['pacs-live']
+  collection = db[coll if coll else "dicom_metadata"]
+  return collection
 
-  db = client['pacs']
-  # collection = db['dicom_metadata']
-  return db
+def client_mongodb():
+  return MongoClient(config.mongodb_url)

@@ -70,3 +70,4 @@ dependencies:
       - watchdog==3.0.0
       - werkzeug==3.0.0
       - firebase-admin==6.3.0
+      - flask_cors

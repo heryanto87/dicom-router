@@ -41,3 +41,4 @@ dependencies:
       - pyinotify==0.9.6
       - flask==3.0.3
       - pymongo==4.6.3
+      - flask_cors
