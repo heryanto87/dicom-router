@@ -95,76 +95,116 @@ def handle_file_dcm(pathname):
       # Insert into patient collection
       dcm_metadata_patient = generate_metadata("patient", file_dcm, pathname)
       patient_coll = _db['patient']
-      patient = patient_coll.update_one(
-          {'patient_id': dcm_metadata_patient["patient_id"]},
-          {
-              "$set": {**dcm_metadata_patient, "updated_at": datetime.now()},
-              "$setOnInsert": {"created_at": datetime.now()}
-          },
-          upsert=True,
-          session=session
-      )
-      
+      # patient = patient_coll.update_one(
+      #     {'patient_id': dcm_metadata_patient["patient_id"]},
+      #     {
+      #         "$set": {**dcm_metadata_patient, "updated_at": datetime.now()},
+      #         "$setOnInsert": {"created_at": datetime.now()}
+      #     },
+      #     upsert=True,
+      #     session=session
+      # )
+      # skip if patient_id is already exist
+      patient = patient_coll.find_one({'patient_id': dcm_metadata_patient["patient_id"]})
+      if not patient:
+        patient = patient_coll.insert_one(
+            {**dcm_metadata_patient, "created_at": datetime.now(), "updated_at": datetime.now()},
+            session=session
+        )
+
       # _patient_id = patient.upserted_id or patient.raw_result.get('upserted')
 
       # Insert into study collection
       dcm_metadata_study = generate_metadata("study", file_dcm, pathname)
       study_coll = _db['study']
-      study = study_coll.update_one(
-          {
-            # "_patient_id": _patient_id,
-            'study_id': dcm_metadata_study["study_id"],
-            'study_instance_uid': dcm_metadata_study["study_instance_uid"],
-            'accession_number': dcm_metadata_study["accession_number"],
-          },
-          {
-              # "$set": {**dcm_metadata_study, "_patient_id": _patient_id, "updated_at": datetime.now()},
-              "$set": {**dcm_metadata_study, "updated_at": datetime.now()},
-              "$setOnInsert": {"created_at": datetime.now()}
-          },
-          upsert=True,
-          session=session
-      )
+      # study = study_coll.update_one(
+      #     {
+      #       # "_patient_id": _patient_id,
+      #       'study_id': dcm_metadata_study["study_id"],
+      #       'study_instance_uid': dcm_metadata_study["study_instance_uid"],
+      #       'accession_number': dcm_metadata_study["accession_number"],
+      #     },
+      #     {
+      #         # "$set": {**dcm_metadata_study, "_patient_id": _patient_id, "updated_at": datetime.now()},
+      #         "$set": {**dcm_metadata_study, "updated_at": datetime.now()},
+      #         "$setOnInsert": {"created_at": datetime.now()}
+      #     },
+      #     upsert=True,
+      #     session=session
+      # )
+      # skip if study_id and patient_id is already exist
+      study = study_coll.find_one({
+          'study_id': dcm_metadata_study["study_id"],
+          'patient_id': dcm_metadata_study["patient_id"]
+      })
+      if not study:
+        study = study_coll.insert_one(
+            {**dcm_metadata_study, "created_at": datetime.now(), "updated_at": datetime.now()},
+            session=session
+        )
       
       # _study_id = study.upserted_id or study.raw_result.get('upserted')
 
       # Insert into series collection
       dcm_metadata_series = generate_metadata("series", file_dcm, pathname)
       series_coll = _db['series']
-      series = series_coll.update_one(
-          {
-            # "_study_id": _study_id,
-            'series_number': dcm_metadata_series["series_number"],
-            'series_instance_uid': dcm_metadata_series["series_instance_uid"],
-          },
-          {
-              # "$set": {**dcm_metadata_series, "_study_id": _study_id, "updated_at": datetime.now()},
-              "$set": {**dcm_metadata_series, "updated_at": datetime.now()},
-              "$setOnInsert": {"created_at": datetime.now()}
-          },
-          upsert=True,
-          session=session
-      )
+      # series = series_coll.update_one(
+      #     {
+      #       # "_study_id": _study_id,
+      #       'series_number': dcm_metadata_series["series_number"],
+      #       'series_instance_uid': dcm_metadata_series["series_instance_uid"],
+      #     },
+      #     {
+      #         # "$set": {**dcm_metadata_series, "_study_id": _study_id, "updated_at": datetime.now()},
+      #         "$set": {**dcm_metadata_series, "updated_at": datetime.now()},
+      #         "$setOnInsert": {"created_at": datetime.now()}
+      #     },
+      #     upsert=True,
+      #     session=session
+      # )
+      # skip if series_number and study_id and patient_id is already exist
+      series = series_coll.find_one({
+          'series_number': dcm_metadata_series["series_number"],
+          'study_id': dcm_metadata_series["study_id"],
+          'patient_id': dcm_metadata_series["patient_id"]
+      })
+      if not series:
+        series = series_coll.insert_one(
+            {**dcm_metadata_series, "created_at": datetime.now(), "updated_at": datetime.now()},
+            session=session
+        )
       
       # _series_id = series.upserted_id or series.raw_result.get('upserted')
 
       # Insert into image collection
       dcm_metadata_image = generate_metadata("image", file_dcm, pathname)
       image_coll = _db['image']
-      image = image_coll.update_one(
-          {
-            # "_series_id": _series_id,
-            'instance_number': dcm_metadata_image["instance_number"],
-            'sop_instance_uid': dcm_metadata_image["sop_instance_uid"],
-          },
-          {
-              # "$set": {**dcm_metadata_image, "_series_id": _series_id, "updated_at": datetime.now()},
-              "$set": {**dcm_metadata_image, "updated_at": datetime.now()},
-              "$setOnInsert": {"created_at": datetime.now()}
-          },
-          upsert=True,
-          session=session
-      )
+      # image = image_coll.update_one(
+      #     {
+      #       # "_series_id": _series_id,
+      #       'instance_number': dcm_metadata_image["instance_number"],
+      #       'sop_instance_uid': dcm_metadata_image["sop_instance_uid"],
+      #     },
+      #     {
+      #         # "$set": {**dcm_metadata_image, "_series_id": _series_id, "updated_at": datetime.now()},
+      #         "$set": {**dcm_metadata_image, "updated_at": datetime.now()},
+      #         "$setOnInsert": {"created_at": datetime.now()}
+      #     },
+      #     upsert=True,
+      #     session=session
+      # )
+      # skip if instance_number and series_id and study_id and patient_id is already exist
+      image = image_coll.find_one({
+          'instance_number': dcm_metadata_image["instance_number"],
+          'series_number': dcm_metadata_image["series_number"],
+          'study_id': dcm_metadata_image["study_id"],
+          'patient_id': dcm_metadata_image["patient_id"]
+      })
+      if not image:
+        image = image_coll.insert_one(
+            {**dcm_metadata_image, "created_at": datetime.now(), "updated_at": datetime.now()},
+            session=session
+        )
 
       # _image_id = image.upserted_id or image.raw_result.get('upserted')
 
@@ -201,8 +241,7 @@ def handle_file_dcm(pathname):
 #         print(f"Error reading DICOM file {first_dcm_file}: {e}")
 
 def dicom_push(pathname):
-  time.sleep(3)
-  # time.sleep(1)
+  time.sleep(1.3)
 
   if allowed_file(pathname):
     if pathname.lower().endswith('.dcm'):
