@@ -12,7 +12,6 @@ def send():
     all_token_set_false()
     bearer_token = get_valid_token()
 
-  print(bearer_token)
   return send_to_whatsapp(bearer_token)
 
 def all_token_set_false():
