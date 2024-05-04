@@ -4,6 +4,7 @@ from utils import config
 from internal.dicom_listener import dicom_push
 from urllib.parse import unquote
 from flask_cors import CORS
+from internal.whatsapp_handler import send
 import os
 
 config.init()
@@ -37,3 +38,10 @@ def sync():
   except Exception as e:
     # Handle errors
     return jsonify({'message': 'Error when syncing filesystem: {}'.format(str(e))}, 500)
+
+@app.route('/whatsapp', methods=['POST'])
+def whatsapp_send():
+  try:
+    send()
+  except Exception as e:
+    return jsonify({'message': 'Error sending whatsapp message: {}'.format(str(e))}, 500)
