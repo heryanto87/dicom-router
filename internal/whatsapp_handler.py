@@ -1,9 +1,11 @@
 import requests
 from utils import halosis_config
 from utils import config
-from utils.mongodb import connect_mongodb
+from utils.mongodb import connect_mongodb, client_mongodb
 
 config.init()
+_client = client_mongodb()
+_db = _client["pacs-live"]
 
 def send():
   bearer_token = get_valid_token()
@@ -15,15 +17,13 @@ def send():
   return send_to_whatsapp(bearer_token)
 
 def all_token_set_false():
-  db = connect_mongodb()
-  collection = db['whatsapp_token']
+  collection = _db['whatsapp_token']
   filter = {'is_active': True}
   update = {'$set': {'is_active': False}}
   collection.update_many(filter, update)
 
 def get_valid_token():
-  db = connect_mongodb()
-  collection = db['whatsapp_token']
+  collection = _db['whatsapp_token']
   exist_token = collection.find_one({"is_active": True})
 
   if exist_token:
