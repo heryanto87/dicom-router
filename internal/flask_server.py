@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, send_file, Response
 from utils.mongodb import connect_mongodb
 from utils import config
 from internal.dicom_listener import dicom_push
@@ -6,11 +6,34 @@ from urllib.parse import unquote
 from flask_cors import CORS
 from internal.whatsapp_handler import send
 import os
+import base64
 
 config.init()
 
 app = Flask(__name__)
 CORS(app) # allow all origins
+
+
+@app.route('/dicom/<patientId>/<studyId>/<seriesNumber>/preview', methods=['GET'])
+def dicom_preview(patientId, studyId, seriesNumber):
+  try:
+    collection = connect_mongodb("series")
+    query = {
+      "patient_id": patientId,
+      "study_id": studyId,
+      "series_number": seriesNumber
+    }
+    result = collection.find_one(query)
+    if not result:
+      return jsonify({'message': 'Data not found'}, 404)
+    if 'preview' not in result:
+      return jsonify({'message': 'Preview image not found'}, 404)
+    base64_image = result['preview'] 
+    image_bytes = base64.b64decode(base64_image)
+    return Response(image_bytes, mimetype='image/jpeg')
+
+  except Exception as e:
+    return jsonify({'message': 'Error when fetching data: {}'.format(str(e))}, 500)
 
 # api that resolve dicom files by path
 @app.route('/file/resolve', methods=['GET'])
