@@ -7,14 +7,31 @@ config.init()
 _client = client_mongodb()
 _db = _client["pacs-live"]
 
-def send():
+def send(
+  patientPhoneNumber, 
+  previewImage, 
+  patientName, 
+  examination, 
+  hospital, 
+  date, 
+  link
+):
   bearer_token = get_valid_token()
   token_expired = check_token_expiry(bearer_token)
   if token_expired:
     all_token_set_false()
     bearer_token = get_valid_token()
 
-  return send_to_whatsapp(bearer_token)
+  return send_to_whatsapp(
+    bearer_token,
+    patientPhoneNumber, 
+    previewImage, 
+    patientName, 
+    examination, 
+    hospital, 
+    date, 
+    link
+  )
 
 def all_token_set_false():
   collection = _db['whatsapp_token']
@@ -50,7 +67,16 @@ def check_token_expiry(bearer_token):
     return False
   return True
 
-def send_to_whatsapp(bearer_token):
+def send_to_whatsapp(
+  bearer_token, 
+  patientPhoneNumber, 
+  previewImage, 
+  patientName, 
+  examination, 
+  hospital, 
+  date, 
+  link
+):
   url = config.whatsapp_provider
   headers = {
     "Authorization": f"Bearer {bearer_token}",
@@ -59,21 +85,51 @@ def send_to_whatsapp(bearer_token):
   payload = {
     "messaging_product": "whatsapp",
     "recipient_type": "individual",
-    "to": "6281238009823",
+    "to": patientPhoneNumber,
     "type": "template",
     "template": {
-        "name": "template_halosis",
+        "name": "pemeriksaan_pasien_3",
         "language": {
-            "code": "id"
+            "code": "en_US"
         },
         "components": [
             {
                 "type": "header",
                 "parameters": [
                     {
-                        "type": "text",
-                        "text": "Heryanto"
+                        "type": "image",
+                        "image": {
+                            "link": previewImage
+                        }
                     }
+                ]
+            }, {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": patientName
+                    },
+                    {
+                        "type": "text",
+                        "text": "*" + examination + "*"
+                    },
+                    {
+                        "type": "text",
+                        "text": hospital
+                    },
+                    {
+                        "type": "text",
+                        "text": date
+                    },
+                    {
+                        "type": "text",
+                        "text": link
+                    },
+                    {
+                        "type": "text",
+                        "text": "*Perhatian*: _Link ini akan kadaluarsa setelah 30 hari_"
+                    },
                 ]
             }
         ]

@@ -41,7 +41,28 @@ def sync():
 
 @app.route('/whatsapp', methods=['POST'])
 def whatsapp_send():
+  data = request.json
+  patientPhoneNumber = data['patient_phone_number'] if 'patient_phone_number' in data else None
+  previewImage = data['preview_image'] if 'preview_image' in data else None
+  patientName = data['patient_name'] if 'patient_name' in data else None
+  examination = data['examination'] if 'examination' in data else None
+  hospital = data['hospital'] if 'hospital' in data else None
+  date = data['date'] if 'date' in data else None
+  link = data['link'] if 'link' in data else None
+
+  if not patientPhoneNumber or not previewImage or not patientName or not examination or not hospital or not date or not link:
+    return jsonify({'message': 'Invalid request body'}, 400)
+
   try:
-    send()
+    send(
+      patientPhoneNumber, 
+      previewImage, 
+      patientName, 
+      examination, 
+      hospital, 
+      date, 
+      link
+    )
+    return jsonify({'message': 'Successfully send whatsapp message'}, 200)
   except Exception as e:
     return jsonify({'message': 'Error sending whatsapp message: {}'.format(str(e))}, 500)
