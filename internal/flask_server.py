@@ -1,14 +1,21 @@
 from flask import Flask, jsonify, request, send_from_directory, send_file, Response
 from utils.mongodb import connect_mongodb
 from utils import config
-from internal.dicom_listener import dicom_push
+from internal.dicom_listener import dicom_push, dicom_to_satusehat_task
 from urllib.parse import unquote
 from flask_cors import CORS
 from internal.whatsapp_handler import send
 import os
 import base64
+import threading
+import time
+import logging
 
 config.init()
+
+LOGGER = logging.getLogger("flask_server")
+FORMAT = '[%(asctime)s] %(message)s'
+logging.basicConfig(filename='flask_server.log', encoding='utf-8', format=FORMAT, level=logging.INFO)
 
 app = Flask(__name__)
 CORS(app) # allow all origins
@@ -89,3 +96,64 @@ def whatsapp_send():
     return jsonify({'message': 'Successfully send whatsapp message'}, 200)
   except Exception as e:
     return jsonify({'message': 'Error sending whatsapp message: {}'.format(str(e))}, 500)
+
+
+# api that send dicom file to dicom router
+# this will trigger C-STORE request to the DICOM router
+# request body: dicom_file
+# do: hit Encounter -> hit ServiceRequest -> git /send-to-dicom-router
+# @app.route('/send-to-dicom-router', methods=['POST'])
+# def send_dicom():
+#   try:
+#     dicom_file = request.files['dicom_file']
+#     if not dicom_file:
+#       return jsonify({'message': 'Invalid request body'}, 400)
+#     dicom_router_status = send_to_dicom_router(dicom_file)
+#     if dicom_router_status[0]:
+#       return jsonify({'message': f'DICOM file sent with status: {dicom_router_status[1]}'}, 200)
+#     else:
+#       return jsonify({'error': 'Failed to establish association with the DICOM router'}, 500)
+#   except Exception as e:
+#     return jsonify({'message': 'Error sending file to DICOM router: {}'.format(str(e))}, 500)
+
+@app.route('/to-satusehat', methods=['POST'])
+def to_satusehat():
+  # get data from request body
+  data = request.json
+  patient_id = data['patient_id'] if 'patient_id' in data else None
+  study_id = data['study_id'] if 'study_id' in data else None
+  accession_number = data['accession_number'] if 'accession_number' in data else None
+
+  LOGGER.info(f"Process to Satusehat")
+  LOGGER.info(f"Patient ID: {patient_id}")
+  LOGGER.info(f"Study ID: {study_id}")
+  LOGGER.info(f"Accession Number: {accession_number}")
+
+  if not patient_id or not study_id or not accession_number:
+    LOGGER.error("Invalid request body")
+    return jsonify({'message': 'Invalid request body'}, 400)
+  
+  try:
+    # check integration data
+    integration_coll = connect_mongodb("integration")
+    query = {
+      "patient_id": patient_id,
+      "study_id": study_id,
+      "accession_number": accession_number
+    }
+    integration_data = integration_coll.find_one(query)
+    if not integration_data:
+      LOGGER.error("Integration data not found")
+      return jsonify({'message': 'Integration data not found'}, 404)
+    else:
+      if integration_data['status'] == 'SUCCESS':
+        LOGGER.info("Data already sent to Satu Sehat")
+        return jsonify({'message': 'Data already sent to Satu Sehat'}, 200)
+      elif integration_data['status'] == 'PENDING' or integration_data['status'] == 'FAILED': # FAILED status will be reprocessed same as PENDING (temporary?)
+        LOGGER.info("Integration data status is PENDING and will be processed")
+        t = threading.Thread(target=dicom_to_satusehat_task, args=(patient_id,study_id,accession_number,))
+        t.start()
+        # t.join() # wait until thread is done
+        return jsonify({'message': 'Integration data processed'}, 200)
+  except Exception as e:
+    return jsonify({'message': 'Error sending file to DICOM router: {}'.format(str(e))}, 500)

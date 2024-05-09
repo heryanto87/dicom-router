@@ -2,15 +2,28 @@ import time
 import zipfile
 import os
 from pydicom import dcmread
+from pynetdicom import AE, AllStoragePresentationContexts, StoragePresentationContexts, ALL_TRANSFER_SYNTAXES
+from pynetdicom.presentation import PresentationContext
 from pydicom.errors import InvalidDicomError
 from utils.mongodb import connect_mongodb, client_mongodb
 from pymongo.errors import OperationFailure
 from datetime import datetime
+from utils import config
+import logging
+from pynetdicom.sop_class import (
+  Verification,
+)
 
+
+config.init()
+
+LOGGER = logging.getLogger("flask_server")
 ALLOWED_EXTENSIONS = {'dcm', 'zip'}
 
 _client = client_mongodb()
-_db = _client["pacs-live"]
+_db = _client[config.pacs_db_name]
+
+
 
 def allowed_file(filename):
   return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -200,6 +213,37 @@ def handle_file_dcm(pathname):
 #       except Exception as e:
 #         print(f"Error reading DICOM file {first_dcm_file}: {e}")
 
+
+# def send_to_dicom_router(dicom_file):    
+#     # Read the received DICOM file
+#     dcm_data = dcmread(dicom_file)
+    
+#     # create a DICOM association and send the DICOM message
+#     ae = AE(ae_title=config.self_ae_title)
+#     ae.add_requested_context(Verification)
+
+#     # assoc = ae.associate('192.168.215.2', config.dicom_port, StoragePresentationContexts, ae_title=config.self_ae_title)
+#     assoc = ae.associate('localhost', config.dicom_port, StoragePresentationContexts, ae_title=config.self_ae_title)
+#     if assoc.is_established:
+#         status = assoc.send_c_store(dcm_data)
+
+#         # Check the status of the storage request
+#         if status:
+#             # If the storage request succeeded this will be 0x0000, in decimal is 0
+#             LOGGER.info('C-STORE request status: 0x{0:04x}'.format(status.Status))
+#             if status.Status == 0x0000:
+#                 LOGGER.info('DICOM file sent successfully')
+#                 return True, status.Status
+#         else:
+#             LOGGER.info('C-STORE request failed with status: 0x{0:04x}'.format(status.Status))
+
+#         assoc.release()
+#         LOGGER.info('Association released')
+#         return False, status.Status
+#     else:
+#         LOGGER.info('Association rejected, aborted or never connected')
+#         return False, None
+
 def dicom_push(pathname):
   time.sleep(3)
   # time.sleep(1)
@@ -208,10 +252,150 @@ def dicom_push(pathname):
     if pathname.lower().endswith('.dcm'):
       handle_file_dcm(pathname)
 
+      # # send to dicom router
+      # dicom_router_status = send_to_dicom_router(pathname)
+      # if dicom_router_status[0]:
+      #   print(f"DICOM file sent to DICOM router with status: {dicom_router_status[1]}")
+      # else:
+      #   print("Failed to establish association with the DICOM router.")
+
     # elif pathname.lower().endswith('.zip'):
     #   handle_file_zip(pathname)
 
   else:
     print("File is not allowed or not a DICOM file.")
 
-# dicom_push('/home/ponyo/pacs-listen-test/IRSYADUL IBAD.Seq2.Ser201.Img1.dcm')
+
+
+def dicom_to_satusehat_task(patient_id, study_id, accession_number):
+    LOGGER.info(f"Processing to Satusehat Task")
+    
+    # create a DICOM association and send the DICOM message
+    ae = AE(ae_title=config.self_ae_title)
+    ae.add_requested_context(Verification)
+
+    assoc = ae.associate('localhost', config.dicom_port, StoragePresentationContexts, ae_title=config.self_ae_title)
+    if assoc.is_established:
+      try:
+          image_coll = connect_mongodb("image")
+          study_instances = image_coll.find({
+              "patient_id": patient_id,
+              "study_id": study_id,
+          }).sort("series_number", 1)
+          instance_list = list(study_instances)
+          LOGGER.info(f"Instances found: {len(instance_list)}")
+
+          for i, imd in enumerate(instance_list):
+              LOGGER.info(f"[{i}] - Processing item with instance_number: {str(imd['instance_number'])}; path: {str(imd['path'])}; series_number: {str(imd['series_number'])}")
+              
+              series_number = imd['series_number'] if 'series_number' in imd else None
+              instance_number = imd['instance_number'] if 'instance_number' in imd else None
+              path = imd['path'] if 'path' in imd else None
+
+              # Read the DICOM file from path
+              dcm_data = dcmread(path)
+
+              # send each instance to DICOM router through send_c_store
+              status = assoc.send_c_store(dcm_data)
+              # Check the status of the storage request
+              if status:
+                  # If the storage request succeeded this will be 0x0000, in decimal is 0
+                  LOGGER.info('C-STORE request status: 0x{0:04x}'.format(status.Status))
+                  if status.Status == 0x0000:
+                      LOGGER.info('DICOM file sent successfully')
+                      image_coll.update_one({
+                        "patient_id": patient_id,
+                        "study_id": study_id,
+                        "series_number": series_number,
+                        "instance_number": instance_number,
+                      }, {
+                        "$set": {
+                          "integration_status_satusehat": 1
+                        }
+                      })
+                  else:
+                      LOGGER.info('C-STORE not success')
+                      image_coll.update_one({
+                        "patient_id": patient_id,
+                        "study_id": study_id,
+                        "series_number": series_number,
+                        "instance_number": instance_number,
+                      }, {
+                        "$set": {
+                          "integration_status_satusehat": 0
+                        }
+                      })
+              else:
+                  LOGGER.info('C-STORE request failed with status: 0x{0:04x}'.format(status.Status))
+                  image_coll.update_one({
+                    "patient_id": patient_id,
+                    "study_id": study_id,
+                    "series_number": series_number,
+                    "instance_number": instance_number,
+                  }, {
+                    "$set": {
+                      "integration_status_satusehat": 0
+                    }
+                  })
+
+
+              # wait until last itteration
+              if i == len(instance_list) - 1:
+                  # count
+                  success_count = image_coll.count_documents({
+                    "patient_id": patient_id,
+                    "study_id": study_id,
+                    "integration_status_satusehat": 1
+                  })
+                  failed_count = image_coll.count_documents({
+                    "patient_id": patient_id,
+                    "study_id": study_id,
+                    "integration_status_satusehat": 0
+                  })
+                  LOGGER.info(f"Success Count: {success_count}")
+                  LOGGER.info(f"Failed Count: {failed_count}")
+                  integration_coll = connect_mongodb("integration")
+                  integration_coll.update_one({
+                    "patient_id": patient_id,
+                    "study_id": study_id,
+                    "accession_number": accession_number
+                  }, {
+                    "$set": {
+                      "count_success": success_count,
+                      "count_failed": failed_count
+                    }
+                  })
+                  # status
+                  if success_count == len(instance_list):
+                      integration_coll.update_one({
+                        "patient_id": patient_id,
+                        "study_id": study_id,
+                        "accession_number": accession_number
+                      }, {
+                        "$set": {
+                          "status": "SUCCESS",
+                          "message": "[dicom-router] All instances sent successfully"
+                        }
+                      })
+                  else:
+                      integration_coll.update_one({
+                        "patient_id": patient_id,
+                        "study_id": study_id,
+                        "accession_number": accession_number
+                      }, {
+                        "$set": {
+                          # "status": "FAILED", # or PENDING?because its partially success
+                          "status": "PENDING",
+                          "message": "[dicom-router] All or some instances failed to send"
+                        }
+                      })
+              time.sleep(1)
+          LOGGER.info(f"Process to Satusehat Task finished")
+      except Exception as e:
+          LOGGER.error(f"Error processing to Satusehat Task: {str(e)}")
+      
+      assoc.release()
+      LOGGER.info('Association released')
+
+    else:
+        LOGGER.info('Association rejected, aborted or never connected')

@@ -2,10 +2,14 @@ import requests
 from utils import halosis_config
 from utils import config
 from utils.mongodb import connect_mongodb, client_mongodb
+import logging
 
 config.init()
+
+LOGGER = logging.getLogger("flask_server")
+
 _client = client_mongodb()
-_db = _client["pacs-live"]
+_db = _client[config.pacs_db_name]
 
 def send(
   patientPhoneNumber, 
@@ -139,6 +143,6 @@ def send_to_whatsapp(
   response = requests.post(url+'/v1/messages', json=payload, headers=headers)
 
   if response.status_code == 200:
-    print("whatsapp message has been sent!")
+    LOGGER.info("whatsapp message has been sent!")
   else:
-    print("error: ", response.json())
+    LOGGER.info("error: ", response.json())
