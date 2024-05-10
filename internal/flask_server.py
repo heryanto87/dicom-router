@@ -98,24 +98,6 @@ def whatsapp_send():
     return jsonify({'message': 'Error sending whatsapp message: {}'.format(str(e))}, 500)
 
 
-# api that send dicom file to dicom router
-# this will trigger C-STORE request to the DICOM router
-# request body: dicom_file
-# do: hit Encounter -> hit ServiceRequest -> git /send-to-dicom-router
-# @app.route('/send-to-dicom-router', methods=['POST'])
-# def send_dicom():
-#   try:
-#     dicom_file = request.files['dicom_file']
-#     if not dicom_file:
-#       return jsonify({'message': 'Invalid request body'}, 400)
-#     dicom_router_status = send_to_dicom_router(dicom_file)
-#     if dicom_router_status[0]:
-#       return jsonify({'message': f'DICOM file sent with status: {dicom_router_status[1]}'}, 200)
-#     else:
-#       return jsonify({'error': 'Failed to establish association with the DICOM router'}, 500)
-#   except Exception as e:
-#     return jsonify({'message': 'Error sending file to DICOM router: {}'.format(str(e))}, 500)
-
 @app.route('/to-satusehat', methods=['POST'])
 def to_satusehat():
   # get data from request body
