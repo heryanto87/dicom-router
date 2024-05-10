@@ -76,6 +76,8 @@ def to_satusehat():
   patient_id = data['patient_id'] if 'patient_id' in data else None
   study_id = data['study_id'] if 'study_id' in data else None
   accession_number = data['accession_number'] if 'accession_number' in data else None
+  series_number = data['series_number'] if 'series_number' in data else None
+  instance_number = data['instance_number'] if 'instance_number' in data else None
 
   LOGGER.info(f"Process to Satusehat")
   LOGGER.info(f"Patient ID: {patient_id}")
@@ -105,7 +107,7 @@ def to_satusehat():
         return jsonify({'message': 'Data already sent to Satu Sehat'}, 200)
       elif integration_data['status'] == 'PENDING' or integration_data['status'] == 'FAILED': # FAILED status will be reprocessed same as PENDING (temporary?)
         LOGGER.info("Integration data status is PENDING and will be processed")
-        t = threading.Thread(target=dicom_to_satusehat_task, args=(patient_id,study_id,accession_number,))
+        t = threading.Thread(target=dicom_to_satusehat_task, args=(patient_id, study_id, accession_number, series_number, instance_number))
         t.start()
         # t.join() # wait until thread is done
         return jsonify({'message': 'Integration data processed'}, 200)

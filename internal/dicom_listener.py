@@ -156,7 +156,7 @@ def dicom_push(pathname):
     print("File is not allowed or not a DICOM file.")
 
 
-def dicom_to_satusehat_task(patient_id, study_id, accession_number):
+def dicom_to_satusehat_task(patient_id, study_id, accession_number, series_number, instance_number):
     LOGGER.info(f"Processing to Satusehat Task")
 
     # create a DICOM association and send the DICOM message
@@ -170,6 +170,8 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number):
           study_instances = image_coll.find({
             "patient_id": patient_id,
             "study_id": study_id,
+            "series_number": series_number,
+            "instance_number": instance_number,
             # exclude image with integration_status_satusehat = 1
             "integration_status_satusehat": {"$ne": 1}
           }).sort("series_number", 1)
@@ -180,6 +182,8 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number):
           image_coll.update_many({
             "patient_id": patient_id,
             "study_id": study_id,
+            "series_number": series_number,
+            "instance_number": instance_number,
           }, {
             "$set": {
               # set integration_satusehat_at to current time
