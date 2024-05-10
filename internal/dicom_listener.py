@@ -75,7 +75,7 @@ def handle_file_dcm(pathname):
       session.start_transaction()
 
       file_dcm = dcmread(pathname, force=True)
-      
+
       # Insert into patient collection
       dcm_metadata_patient = generate_metadata("patient", file_dcm, pathname)
       patient_coll = _db['patient']
@@ -88,7 +88,7 @@ def handle_file_dcm(pathname):
           upsert=True,
           session=session
       )
-      
+
       # Insert into study collection
       dcm_metadata_study = generate_metadata("study", file_dcm, pathname)
       study_coll = _db['study']
@@ -105,7 +105,7 @@ def handle_file_dcm(pathname):
           upsert=True,
           session=session
       )
-      
+
       # Insert into series collection
       dcm_metadata_series = generate_metadata("series", file_dcm, pathname)
       series_coll = _db['series']
@@ -121,7 +121,7 @@ def handle_file_dcm(pathname):
           upsert=True,
           session=session
       )
-      
+
       # Insert into image collection
       dcm_metadata_image = generate_metadata("image", file_dcm, pathname)
       image_coll = _db['image']
@@ -158,7 +158,7 @@ def dicom_push(pathname):
 
 def dicom_to_satusehat_task(patient_id, study_id, accession_number):
     LOGGER.info(f"Processing to Satusehat Task")
-    
+
     # create a DICOM association and send the DICOM message
     ae = AE(ae_title=config.self_ae_title)
     ae.add_requested_context(Verification)
@@ -187,7 +187,7 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number):
 
           for i, imd in enumerate(instance_list):
               LOGGER.info(f"[{i}] - Processing item with instance_number: {str(imd['instance_number'])}; path: {str(imd['path'])}; series_number: {str(imd['series_number'])}")
-              
+
               series_number = imd['series_number'] if 'series_number' in imd else None
               instance_number = imd['instance_number'] if 'instance_number' in imd else None
               path = imd['path'] if 'path' in imd else None
@@ -292,7 +292,7 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number):
           LOGGER.info(f"Process to Satusehat Task finished")
       except Exception as e:
           LOGGER.error(f"Error processing to Satusehat Task: {str(e)}")
-      
+
       assoc.release()
       LOGGER.info('Association released')
 
