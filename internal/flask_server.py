@@ -111,7 +111,8 @@ def to_satusehat():
   LOGGER.info(f"Study ID: {study_id}")
   LOGGER.info(f"Accession Number: {accession_number}")
 
-  if not patient_id or not study_id or not accession_number:
+  # if not patient_id or not study_id or not accession_number:
+  if not patient_id or not study_id:
     LOGGER.error("Invalid request body")
     return jsonify({'message': 'Invalid request body'}, 400)
   

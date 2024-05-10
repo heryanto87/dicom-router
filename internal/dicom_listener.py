@@ -174,6 +174,17 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number):
           instance_list = list(study_instances)
           LOGGER.info(f"Instances found: {len(instance_list)}")
 
+          # bulk update study_instances
+          image_coll.update_many({
+            "patient_id": patient_id,
+            "study_id": study_id,
+          }, {
+            "$set": {
+              # set integration_satusehat_at to current time
+              "integration_satusehat_at": datetime.now(),
+            }
+          })
+
           for i, imd in enumerate(instance_list):
               LOGGER.info(f"[{i}] - Processing item with instance_number: {str(imd['instance_number'])}; path: {str(imd['path'])}; series_number: {str(imd['series_number'])}")
               
