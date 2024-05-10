@@ -22,37 +22,6 @@ app = Flask(__name__)
 CORS(app) # allow all origins
 
 
-@app.route('/dicom/<patientId>/<studyId>/<seriesNumber>/preview', methods=['GET'])
-def dicom_preview(patientId, studyId, seriesNumber):
-  try:
-    collection = connect_mongodb("series")
-    query = {
-      "patient_id": patientId,
-      "study_id": studyId,
-      "series_number": seriesNumber
-    }
-    result = collection.find_one(query)
-    if not result:
-      return jsonify({'message': 'Data not found'}, 404)
-    if 'preview' not in result:
-      return jsonify({'message': 'Preview image not found'}, 404)
-    base64_image = result['preview']
-    image_bytes = base64.b64decode(base64_image)
-    return Response(image_bytes, mimetype='image/jpeg')
-
-  except Exception as e:
-    return jsonify({'message': 'Error when fetching data: {}'.format(str(e))}, 500)
-
-# api that resolve dicom files by path
-@app.route('/file/resolve', methods=['GET'])
-def file_resolve_by_path():
-  filename = request.args.get('filename')
-  print(f"Filename: {filename}")
-  try:
-    return send_from_directory(config.inotify_dir, filename, as_attachment=True)
-  except FileNotFoundError:
-    return "File not found", 404
-
 @app.route('/sync', methods=['GET'])
 def sync():
   try:
@@ -69,6 +38,7 @@ def sync():
   except Exception as e:
     # Handle errors
     return jsonify({'message': 'Error when syncing filesystem: {}'.format(str(e))}, 500)
+
 
 @app.route('/whatsapp', methods=['POST'])
 def whatsapp_send():
@@ -141,6 +111,7 @@ def to_satusehat():
         return jsonify({'message': 'Integration data processed'}, 200)
   except Exception as e:
     return jsonify({'message': 'Error sending file to DICOM router: {}'.format(str(e))}, 500)
+
 
 @app.route('/dicom-upsert', methods=['POST'])
 def dicom_upsert():
