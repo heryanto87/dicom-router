@@ -1,0 +1,198 @@
+[2024-05-10 17:46:15,285] [Init] - Starting services
+[2024-05-10 17:46:15,285] [Init] - Set up store handler
+[2024-05-10 17:46:15,331] [Init] - Clearing incoming folder
+[2024-05-10 17:46:15,332] [Init] - Watching directory /shared
+[2024-05-10 17:46:15,333] [Init] - Starting Flask service on port 8081
+[2024-05-10 17:46:15,335] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 17:46:15,336] [Init] - Starting HTTP service on port 8080...
+[2024-05-10 17:46:15,339] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 17:46:15,340] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 17:46:15,340] [33mPress CTRL+C to quit[0m
+[2024-05-10 17:54:06,209] 127.0.0.1 - - [10/May/2024 17:54:06] "[33mPOST /v1/messages HTTP/1.1[0m" 404 -
+[2024-05-10 17:54:44,585] 127.0.0.1 - - [10/May/2024 17:54:44] "[33mPOST /v1/messages HTTP/1.1[0m" 404 -
+[2024-05-10 17:55:23,621] 127.0.0.1 - - [10/May/2024 17:55:23] "[33mPOST /v1/messages HTTP/1.1[0m" 404 -
+[2024-05-10 17:55:39,493] [Init] - Starting services
+[2024-05-10 17:55:39,494] [Init] - Set up store handler
+[2024-05-10 17:55:39,534] [Init] - Clearing incoming folder
+[2024-05-10 17:55:39,535] [Init] - Watching directory /shared
+[2024-05-10 17:55:39,536] [Init] - Starting Flask service on port 8081
+[2024-05-10 17:55:39,537] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 17:55:39,543] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 17:55:39,544] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 17:55:39,544] [33mPress CTRL+C to quit[0m
+[2024-05-10 17:55:42,946] Exception on /dicom-upsert [POST]
+Traceback (most recent call last):
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 2529, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask_cors/extension.py", line 165, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/home/ponyo/dicom-router/internal/flask_server.py", line 145, in dicom_upsert
+    data = request.json()
+TypeError: 'dict' object is not callable
+[2024-05-10 17:55:42,961] 127.0.0.1 - - [10/May/2024 17:55:42] "[35m[1mPOST /dicom-upsert HTTP/1.1[0m" 500 -
+[2024-05-10 17:56:41,630] [Init] - Starting services
+[2024-05-10 17:56:41,630] [Init] - Set up store handler
+[2024-05-10 17:56:41,681] [Init] - Clearing incoming folder
+[2024-05-10 17:56:41,682] [Init] - Watching directory /shared
+[2024-05-10 17:56:41,684] [Init] - Starting HTTP service on port 8080...
+[2024-05-10 17:56:41,682] [Init] - Starting Flask service on port 8081
+[2024-05-10 17:56:41,683] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 17:56:41,690] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 17:56:41,690] [33mPress CTRL+C to quit[0m
+[2024-05-10 17:56:41,691] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 17:56:49,454] Exception on /dicom-upsert [POST]
+Traceback (most recent call last):
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 2529, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask_cors/extension.py", line 165, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/home/ponyo/dicom-router/internal/flask_server.py", line 146, in dicom_upsert
+    data = request.json()
+TypeError: 'dict' object is not callable
+[2024-05-10 17:56:49,456] 127.0.0.1 - - [10/May/2024 17:56:49] "[35m[1mPOST /dicom-upsert HTTP/1.1[0m" 500 -
+[2024-05-10 17:57:18,356] [Init] - Starting services
+[2024-05-10 17:57:18,357] [Init] - Set up store handler
+[2024-05-10 17:57:18,399] [Init] - Clearing incoming folder
+[2024-05-10 17:57:18,400] [Init] - Watching directory /shared
+[2024-05-10 17:57:18,400] [Init] - Starting Flask service on port 8081
+[2024-05-10 17:57:18,402] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 17:57:18,407] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 17:57:18,409] [33mPress CTRL+C to quit[0m
+[2024-05-10 17:57:18,410] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 17:57:20,960] Exception on /dicom-upsert [POST]
+Traceback (most recent call last):
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 2529, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask_cors/extension.py", line 165, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/home/ponyo/dicom-router/internal/flask_server.py", line 145, in dicom_upsert
+    data = request.json()
+TypeError: 'dict' object is not callable
+[2024-05-10 17:57:20,962] 127.0.0.1 - - [10/May/2024 17:57:20] "[35m[1mPOST /dicom-upsert HTTP/1.1[0m" 500 -
+[2024-05-10 17:57:28,619] Exception on /dicom-upsert [POST]
+Traceback (most recent call last):
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 2529, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask_cors/extension.py", line 165, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ponyo/anaconda3/envs/dicom-router/lib/python3.10/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/home/ponyo/dicom-router/internal/flask_server.py", line 145, in dicom_upsert
+    data = request.json()
+TypeError: 'dict' object is not callable
+[2024-05-10 17:57:28,620] 127.0.0.1 - - [10/May/2024 17:57:28] "[35m[1mPOST /dicom-upsert HTTP/1.1[0m" 500 -
+[2024-05-10 17:57:49,024] [Init] - Starting services
+[2024-05-10 17:57:49,025] [Init] - Set up store handler
+[2024-05-10 17:57:49,066] [Init] - Clearing incoming folder
+[2024-05-10 17:57:49,067] [Init] - Watching directory /shared
+[2024-05-10 17:57:49,067] [Init] - Starting Flask service on port 8081
+[2024-05-10 17:57:49,071] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 17:57:49,072] [Init] - Starting HTTP service on port 8080...
+[2024-05-10 17:57:49,077] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 17:57:49,077] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 17:57:49,078] [33mPress CTRL+C to quit[0m
+[2024-05-10 17:57:50,474] 127.0.0.1 - - [10/May/2024 17:57:50] "POST /dicom-upsert HTTP/1.1" 200 -
+[2024-05-10 18:15:14,512] [Init] - Starting services
+[2024-05-10 18:15:14,512] [Init] - Set up store handler
+[2024-05-10 18:15:14,557] [Init] - Clearing incoming folder
+[2024-05-10 18:15:14,558] [Init] - Watching directory /shared
+[2024-05-10 18:15:14,559] [Init] - Starting Flask service on port 8081
+[2024-05-10 18:15:14,561] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 18:15:14,566] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 18:15:14,567] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 18:15:14,567] [33mPress CTRL+C to quit[0m
+[2024-05-10 18:15:17,901] 127.0.0.1 - - [10/May/2024 18:15:17] "[33mPOST /dicom-upsert%20 HTTP/1.1[0m" 404 -
+[2024-05-10 18:16:07,914] [Init] - Starting services
+[2024-05-10 18:16:07,914] [Init] - Set up store handler
+[2024-05-10 18:16:07,958] [Init] - Clearing incoming folder
+[2024-05-10 18:16:07,959] [Init] - Watching directory /shared
+[2024-05-10 18:16:07,960] [Init] - Starting Flask service on port 8081
+[2024-05-10 18:16:07,961] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 18:16:07,967] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 18:16:07,970] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 18:16:07,970] [33mPress CTRL+C to quit[0m
+[2024-05-10 18:16:10,513] 127.0.0.1 - - [10/May/2024 18:16:10] "[33mPOST /dicom-upsert%20 HTTP/1.1[0m" 404 -
+[2024-05-10 18:16:28,212] [Init] - Starting services
+[2024-05-10 18:16:28,212] [Init] - Set up store handler
+[2024-05-10 18:16:28,260] [Init] - Clearing incoming folder
+[2024-05-10 18:16:28,261] [Init] - Watching directory /shared
+[2024-05-10 18:16:28,261] [Init] - Starting Flask service on port 8081
+[2024-05-10 18:16:28,266] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 18:16:28,263] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 18:16:28,269] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 18:16:28,269] [33mPress CTRL+C to quit[0m
+[2024-05-10 18:16:34,798] 127.0.0.1 - - [10/May/2024 18:16:34] "[33mPOST /dicom-upsert%20 HTTP/1.1[0m" 404 -
+[2024-05-10 18:16:57,197] [Init] - Starting services
+[2024-05-10 18:16:57,197] [Init] - Set up store handler
+[2024-05-10 18:16:57,242] [Init] - Clearing incoming folder
+[2024-05-10 18:16:57,242] [Init] - Watching directory /shared
+[2024-05-10 18:16:57,243] [Init] - Starting Flask service on port 8081
+[2024-05-10 18:16:57,245] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 18:16:57,246] [Init] - Starting HTTP service on port 8080...
+[2024-05-10 18:16:57,250] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 18:16:57,251] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 18:16:57,251] [33mPress CTRL+C to quit[0m
+[2024-05-10 18:16:59,787] 127.0.0.1 - - [10/May/2024 18:16:59] "[33mPOST /dicom-upsert%20 HTTP/1.1[0m" 404 -
+[2024-05-10 18:17:13,324] 127.0.0.1 - - [10/May/2024 18:17:13] "[33mPOST /dicom-upsert%20 HTTP/1.1[0m" 404 -
+[2024-05-10 18:17:47,504] [Init] - Starting services
+[2024-05-10 18:17:47,504] [Init] - Set up store handler
+[2024-05-10 18:17:47,552] [Init] - Clearing incoming folder
+[2024-05-10 18:17:47,553] [Init] - Watching directory /shared
+[2024-05-10 18:17:47,554] [Init] - Starting Flask service on port 8081
+[2024-05-10 18:17:47,555] [Init] - Spawning DICOM interface on port 11112 with AE title: DCMROUTER.
+[2024-05-10 18:17:47,558] add_watch: cannot watch /shared WD=-1, Errno=No such file or directory (ENOENT)
+[2024-05-10 18:17:47,561] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://172.18.199.122:8081
+[2024-05-10 18:17:47,561] [33mPress CTRL+C to quit[0m
+[2024-05-10 18:17:50,620] 127.0.0.1 - - [10/May/2024 18:17:50] "POST /dicom-upsert HTTP/1.1" 200 -

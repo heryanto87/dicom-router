@@ -1,10 +1,11 @@
 from flask import Flask, jsonify, request, send_from_directory, send_file, Response
-from utils.mongodb import connect_mongodb
+from utils.mongodb import connect_mongodb, client_mongodb
 from utils import config
 from internal.dicom_listener import dicom_push, dicom_to_satusehat_task
 from urllib.parse import unquote
 from flask_cors import CORS
 from internal.whatsapp_handler import send
+from datetime import datetime
 import os
 import base64
 import threading
@@ -35,7 +36,7 @@ def dicom_preview(patientId, studyId, seriesNumber):
       return jsonify({'message': 'Data not found'}, 404)
     if 'preview' not in result:
       return jsonify({'message': 'Preview image not found'}, 404)
-    base64_image = result['preview'] 
+    base64_image = result['preview']
     image_bytes = base64.b64decode(base64_image)
     return Response(image_bytes, mimetype='image/jpeg')
 
@@ -85,12 +86,12 @@ def whatsapp_send():
 
   try:
     send(
-      patientPhoneNumber, 
-      previewImage, 
-      patientName, 
-      examination, 
-      hospital, 
-      date, 
+      patientPhoneNumber,
+      previewImage,
+      patientName,
+      examination,
+      hospital,
+      date,
       link
     )
     return jsonify({'message': 'Successfully send whatsapp message'}, 200)
@@ -114,7 +115,7 @@ def to_satusehat():
   if not patient_id or not study_id or not accession_number:
     LOGGER.error("Invalid request body")
     return jsonify({'message': 'Invalid request body'}, 400)
-  
+
   try:
     # check integration data
     integration_coll = connect_mongodb("integration")
@@ -139,3 +140,80 @@ def to_satusehat():
         return jsonify({'message': 'Integration data processed'}, 200)
   except Exception as e:
     return jsonify({'message': 'Error sending file to DICOM router: {}'.format(str(e))}, 500)
+
+@app.route('/dicom-upsert', methods=['POST'])
+def dicom_upsert():
+  _client = client_mongodb()
+  _db = _client[config.pacs_db_name]
+
+  data = request.json
+  dcm_metadata_patient = data["metadata_patient"]
+  dcm_metadata_study = data["metadata_study"]
+  dcm_metadata_series = data["metadata_series"]
+  dcm_metadata_image = data["metadata_image"]
+
+  with _client.start_session() as session:
+    try:
+      session.start_transaction()
+
+      patient_coll = _db['patient']
+      patient = patient_coll.update_one(
+          {'patient_id': dcm_metadata_patient["patient_id"]},
+          {
+              "$set": {**dcm_metadata_patient, "updated_at": datetime.now()},
+              "$setOnInsert": {"created_at": datetime.now()}
+          },
+          upsert=True,
+          session=session
+      )
+
+      # Insert into study collection
+      study_coll = _db['study']
+      study = study_coll.update_one(
+          {
+            'study_id': dcm_metadata_study["study_id"],
+            'study_instance_uid': dcm_metadata_study["study_instance_uid"],
+            'accession_number': dcm_metadata_study["accession_number"],
+          },
+          {
+              "$set": {**dcm_metadata_study, "updated_at": datetime.now()},
+              "$setOnInsert": {"created_at": datetime.now()}
+          },
+          upsert=True,
+          session=session
+      )
+
+      # Insert into series collection
+      series_coll = _db['series']
+      series = series_coll.update_one(
+          {
+            'series_number': dcm_metadata_series["series_number"],
+            'series_instance_uid': dcm_metadata_series["series_instance_uid"],
+          },
+          {
+              "$set": {**dcm_metadata_series, "updated_at": datetime.now()},
+              "$setOnInsert": {"created_at": datetime.now()}
+          },
+          upsert=True,
+          session=session
+      )
+
+      # Insert into image collection
+      image_coll = _db['image']
+      image = image_coll.update_one(
+          {
+            'instance_number': dcm_metadata_image["instance_number"],
+            'sop_instance_uid': dcm_metadata_image["sop_instance_uid"],
+          },
+          {
+              "$set": {**dcm_metadata_image, "updated_at": datetime.now()},
+              "$setOnInsert": {"created_at": datetime.now()}
+          },
+          upsert=True,
+          session=session
+      )
+
+      session.commit_transaction()
+    except (InvalidDicomError, OperationFailure) as e:
+      session.abort_transaction()
+  return jsonify({'message': 'Dicom data successfully upserted'}, 200)
