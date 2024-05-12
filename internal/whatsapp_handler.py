@@ -64,7 +64,8 @@ def check_token_expiry(bearer_token):
   url = config.whatsapp_provider
   headers = {
     "Authorization": f"Bearer {bearer_token}",
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    'User-Agent': 'PostmanRuntime/7.26.8',
   }
   response = requests.get(url+'/v1/balance', headers=headers)
   if response.status_code == 200:
@@ -84,7 +85,8 @@ def send_to_whatsapp(
   url = config.whatsapp_provider
   headers = {
     "Authorization": f"Bearer {bearer_token}",
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    'User-Agent': 'PostmanRuntime/7.26.8',
   }
   payload = {
     "messaging_product": "whatsapp",
