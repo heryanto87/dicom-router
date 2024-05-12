@@ -20,7 +20,7 @@ dcm_dir = config.get("satusehat", "dcm_dir")
 
 
 def get_service_request(accessionNumber):
-  headers = {"Accept": "application/json", "Authorization": "Bearer " + oauth2.token}
+  headers = {"Accept": "application/json", "Authorization": "Bearer " + oauth2.token, 'User-Agent': 'PostmanRuntime/7.26.8',}
   path = (
     fhir_pathsuffix
     + "/ServiceRequest?identifier=http://sys-ids.kemkes.go.id/acsn/"
@@ -40,7 +40,7 @@ def get_service_request(accessionNumber):
 
 
 def get_imaging_study(accessionNumber, token):
-  headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
+  headers = {"Accept": "application/json", "Authorization": "Bearer " + token, 'User-Agent': 'PostmanRuntime/7.26.8',}
   path = (
     fhir_pathsuffix
     + "/ImagingStudy?identifier=http://sys-ids.kemkes.go.id/acsn/"
@@ -61,6 +61,7 @@ def imagingstudy_post(filename, id):
   headers = {
     "Authorization": "Bearer " + oauth2.token,
     "Content-Type": "application/json",
+    'User-Agent': 'PostmanRuntime/7.26.8',
   }
   payload = open(filename, "rb")
   if id == None:
@@ -94,6 +95,7 @@ def dicom_push(assocId, study_iuid, imagingStudyID):
       "Accept": "application/dicom+json",
       "Authorization": "Bearer " + oauth2.token,
       "X-ImagingStudy-ID": imagingStudyID,
+      'User-Agent': 'PostmanRuntime/7.26.8',
   }
 
   instances = dbq.Query(dbq.GET_INSTANCES_PER_STUDY, [assocId, study_iuid])
@@ -162,9 +164,9 @@ def dicom_push(assocId, study_iuid, imagingStudyID):
 
 
 def get_dcm_config(token):
-  # headers = {"Accept": "application/json", "Authorization": "Bearer " + token}
-  # path = fhir_pathsuffix + "/dcm_cfg"
-  # res = requests.get(url=url + path, headers=headers)
-  # data = res.json()
-  # return data
-  return {"SATUSEHAT_CLIENT_ENABLE": False}
+  headers = {"Accept": "application/json", 'User-Agent': 'PostmanRuntime/7.26.8', "Authorization": "Bearer " + token, 'User-Agent': 'PostmanRuntime/7.26.8',}
+  path = fhir_pathsuffix + "/dcm_cfg"
+  res = requests.get(url=url + path, headers=headers)
+  data = res.json()
+  return data
+  
