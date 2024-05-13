@@ -164,7 +164,7 @@ def dicom_push(assocId, study_iuid, imagingStudyID):
 
 
 def get_dcm_config(token):
-  headers = {"Accept": "application/json", 'User-Agent': 'PostmanRuntime/7.26.8', "Authorization": "Bearer " + token, 'User-Agent': 'PostmanRuntime/7.26.8',}
+  headers = {"Accept": "application/json", "User-Agent": "PostmanRuntime/7.26.8", "Authorization": "Bearer " + token}
   path = fhir_pathsuffix + "/dcm_cfg"
   res = requests.get(url=url + path, headers=headers)
   data = res.json()
