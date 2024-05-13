@@ -100,13 +100,13 @@ class EventHandler(pyinotify.ProcessEvent):
     # whatsapp_handler.send()
     dicom_listener.dicom_push(event.pathname)
 
-def watch_directory():
-  LOGGER.info(f"[Init] - Watching directory {config.inotify_dir}")
-  wm = pyinotify.WatchManager()
-  handler = EventHandler()
-  notifier = pyinotify.Notifier(wm, handler)
-  wm.add_watch(config.inotify_dir, pyinotify.IN_CREATE)
-  notifier.loop()
+# def watch_directory():
+#   LOGGER.info(f"[Init] - Watching directory {config.inotify_dir}")
+#   wm = pyinotify.WatchManager()
+#   handler = EventHandler()
+#   notifier = pyinotify.Notifier(wm, handler)
+#   wm.add_watch(config.inotify_dir, pyinotify.IN_CREATE)
+#   notifier.loop()
 
 def flask_server():
   LOGGER.info(f'[Init] - Starting Flask service on port {config.flask_port}')
@@ -114,9 +114,9 @@ def flask_server():
     app.run(host="0.0.0.0",port=config.flask_port)
 
 # Start the thread for watching the directory
-watch_thread = threading.Thread(target=watch_directory)
+# watch_thread = threading.Thread(target=watch_directory)
 flask_thread = threading.Thread(target=flask_server)
-watch_thread.start()
+# watch_thread.start()
 flask_thread.start()
 
 # Start listening for incoming association requests
