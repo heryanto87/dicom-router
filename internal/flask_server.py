@@ -188,6 +188,46 @@ def dicom_upsert():
       )
 
       session.commit_transaction()
-    except (InvalidDicomError, OperationFailure) as e:
+    except Exception as e:
       session.abort_transaction()
   return jsonify({'message': 'Dicom data successfully upserted'}, 200)
+
+@app.route('/dicom-delete', methods=['POST'])
+def dicom_delete():
+  try:
+    # delete patient id from database
+    _client = client_mongodb()
+    _db = _client[config.pacs_db_name]
+    body_data = request.json
+    file_query = {'path': body_data['path']}
+
+    image_coll = _db['image']
+    result = image_coll.find_one(file_query)
+    query = {
+      'study_id': result['study_id'],
+      'patient_id': result['patient_id']
+      }
+
+    result = image_coll.delete_one(query)
+    if result.deleted_count == 1:
+      print("One document deleted successfully from image collection!")
+    else:
+      print("No documents matched the query from image collection.")
+
+    study_coll = _db['study']
+    result = study_coll.delete_one(query)
+    if result.deleted_count == 1:
+      print("One document deleted successfully from study collection!")
+    else:
+      print("No documents matched the query from study collection.")
+
+    series_coll = _db['series']
+    result = series_coll.delete_one(query)
+    if result.deleted_count == 1:
+      print("One document deleted successfully from series collection!")
+    else:
+      print("No documents matched the query from series collection.")
+
+    return jsonify({'message': 'Successfully delete dicom file'}, 200)
+  except Exception as e:
+    return jsonify({'message': 'Failed to delete dicom file'}, 500)
