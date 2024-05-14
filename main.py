@@ -37,6 +37,8 @@ token = str()
 
 debug_logger()
 LOGGER = logging.getLogger('pynetdicom')
+FORMAT = '[%(asctime)s] %(message)s'
+logging.basicConfig(filename='dicom_router_inotify.log', encoding='utf-8', format=FORMAT, level=logging.INFO)
 
 # Implement a handler for evt.EVT_C_STORE
 

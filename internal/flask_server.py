@@ -14,9 +14,7 @@ import logging
 
 config.init()
 
-LOGGER = logging.getLogger("flask_server")
-FORMAT = '[%(asctime)s] %(message)s'
-logging.basicConfig(filename='flask_server.log', encoding='utf-8', format=FORMAT, level=logging.INFO)
+LOGGER = logging.getLogger("dicom_router_inotify")
 
 app = Flask(__name__)
 CORS(app) # allow all origins
@@ -210,23 +208,23 @@ def dicom_delete():
 
     result = image_coll.delete_one(query)
     if result.deleted_count == 1:
-      print("One document deleted successfully from image collection!")
+      LOGGER.info("One document deleted successfully from image collection!")
     else:
-      print("No documents matched the query from image collection.")
+      LOGGER.info("No documents matched the query from image collection.")
 
     study_coll = _db['study']
     result = study_coll.delete_one(query)
     if result.deleted_count == 1:
-      print("One document deleted successfully from study collection!")
+      LOGGER.info("One document deleted successfully from study collection!")
     else:
-      print("No documents matched the query from study collection.")
+      LOGGER.info("No documents matched the query from study collection.")
 
     series_coll = _db['series']
     result = series_coll.delete_one(query)
     if result.deleted_count == 1:
-      print("One document deleted successfully from series collection!")
+      LOGGER.info("One document deleted successfully from series collection!")
     else:
-      print("No documents matched the query from series collection.")
+      LOGGER.info("No documents matched the query from series collection.")
 
     return jsonify({'message': 'Successfully delete dicom file'}, 200)
   except Exception as e:
