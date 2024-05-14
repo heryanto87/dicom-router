@@ -49,7 +49,7 @@ def whatsapp_send():
   date = data['date'] if 'date' in data else None
   link = data['link'] if 'link' in data else None
 
-  if not patientPhoneNumber or not previewImage or not patientName or not examination or not hospital or not date or not link:
+  if not patientPhoneNumber:
     return jsonify({'message': 'Invalid request body'}, 400)
 
   try:
