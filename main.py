@@ -100,6 +100,7 @@ os.mkdir(os.getcwd()+config.dcm_dir)
 class EventHandler(pyinotify.ProcessEvent):
   def process_IN_CREATE(self, event):
     # whatsapp_handler.send()
+    print("hello hery")
     dicom_listener.dicom_push(event.pathname)
 
 # def watch_directory():

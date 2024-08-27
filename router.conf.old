@@ -1,0 +1,51 @@
+[satusehat]
+organization_id = 10000004
+#organization_id = 10085103
+
+# PRODUCTION
+#client_key=PTJtIbIcWVGaOuZxSastULyeavkAMgAeFWGQm16eKAnCrAnF
+#secret_key=ZKBIQTvdyNLANfz8BxD2WoTw8JWzv3CKo0fAd28SczWW9VxiupXbo4ZTcwPPBYBl
+
+# DEV
+client_key = cf98YLQXGn13zA5JvtaxEamGYz2StpAI4BJD4NiFZPpTeFue
+secret_key = klKeKBKgaFiI8hr9bs4OZ0x7XuGtIIg3uie7gXNEnCRxMRzCVZAiJehG4DO0jdVT
+
+#client_key = aHHY2udPPmJVG6D2PP9qWaAOskliCZAYa7VAxAG5cicSsHN3
+#secret_key = svllwu5DgrLJIOAdD7WstStc5UIakEJDdHVmAMjxHSVJ6h0yBclmT4G4GHfv0eAc
+
+# staging
+#client_key = GOBriyCXpww1R6CnzgO8J6ksywae2MlyzqdZsFKlRJRvSshR
+#secret_key = NUXn6LASxiAScL3WxW0ibIYpVBFnFuxK3bqmLKzIvOgnQKOUx6QA8I26nOGQGuFN
+
+# url = https://api-satusehat-dev.dto.kemkes.go.id
+url = https://api-satusehat-stg.dto.kemkes.go.id
+# PRODUCTION
+#url = https://api-satusehat.kemkes.go.id
+
+dicom_pathsuffix = /dicom/v1/dicomWeb/studies
+fhir_pathsuffix = /fhir-r4/v1
+tz_name = Asia/Jakarta
+ae_title = DCMROUTER
+dicom_port = 11112
+# ini dicom router pake waktu hit declare handle_assoc_released handler
+dcm_dir = /in/
+http_port = 8080
+mroc_client_url = http://0.0.0.0:8081
+encrypt = false
+# mongodb_url=mongodb://host.docker.internal:27017?replicaSet=rs
+# mongodb_url=mongodb://192.168.215.1:27017?retryWrites=true&w=majority&replicaSet=rs
+
+# firebase_certificate_path = /home/venhad/Sites/dto-ihs-prod-firebase-adminsdk-r1ny3-c1a0aed195.json
+# firebase_database = dto-ihs-prod-default-rtdb
+
+
+
+# flask bridge
+flask_port = 8082
+inotify_dir = /var/www/pacs-live/public/upload
+mongodb_url=mongodb+srv://mboclaimuser:g8Ke3NpOX9u7hUUg@mboclaim.elpaesz.mongodb.net/pacs-live-new-insert?retryWrites=true&w=majority
+pacs_db_name = pacs-live-new-insert
+# wa
+whatsapp_provider = https://api.halosis.id
+halosis_email = halosis_testapi@gmail.com
+halosis_pass = H4losis123

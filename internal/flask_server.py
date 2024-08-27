@@ -229,3 +229,27 @@ def dicom_delete():
     return jsonify({'message': 'Successfully delete dicom file'}, 200)
   except Exception as e:
     return jsonify({'message': 'Failed to delete dicom file'}, 500)
+
+
+
+@app.route('/file/resolve', methods=['GET'])
+def file_resolve_by_path():
+    file_path = request.args.get('path')
+    if not file_path:
+        return "Path not provided", 400
+
+    print(f"File path: {file_path}")
+
+    # Ensure the path is within the allowed directory
+    allowed_directory = '/var/www/lts-temp'
+    if not os.path.commonpath([allowed_directory, os.path.realpath(file_path)]).startswith(allowed_directory):
+        return "Unauthorized file access", 403
+
+    if not os.path.isfile(file_path):
+        return "File not found", 404
+
+    try:
+        return send_file(file_path, as_attachment=True)
+    except FileNotFoundError:
+        return "File not found", 404
+
