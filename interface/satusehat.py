@@ -7,7 +7,7 @@ import os
 
 from utils.dicomutils import make_hash
 
-dbq = dbquery()
+dbq = DBQuery()
 LOGGER = logging.getLogger("pynetdicom")
 
 config = configparser.ConfigParser()
