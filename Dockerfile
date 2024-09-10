@@ -36,6 +36,7 @@ RUN echo "conda activate dicom-router" > ~/.bashrc
 
 EXPOSE 11112
 EXPOSE 8081
+EXPOSE 8082
 
 # The code to run when container is started:
 # Ensure that the copied files are owned by the non-root user
