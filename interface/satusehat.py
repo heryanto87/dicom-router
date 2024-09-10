@@ -1,6 +1,6 @@
 import configparser
 import logging
-from utils.dbquery import dbquery
+from utils.dbquery import DBQuery
 from utils import oauth2
 import requests
 import os
@@ -169,4 +169,3 @@ def get_dcm_config(token):
   res = requests.get(url=url + path, headers=headers)
   data = res.json()
   return data
-  
