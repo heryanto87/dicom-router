@@ -1,201 +1,155 @@
 import configparser
-from datetime import datetime, timedelta
-from os import sep
-from time import timezone
-import time
-from xmlrpc.client import DateTime
+from datetime import datetime
 import pytz
 
-from fhir.resources import imagingstudy
-from fhir.resources import identifier
-from fhir.resources import codeableconcept
-from fhir.resources import coding
-from fhir.resources import patient
-from fhir.resources import humanname
-from fhir.resources import fhirtypes
+from fhir.resources import imagingstudy, identifier, codeableconcept, coding, patient, humanname, fhirtypes
 
-from pydicom import FileDataset
-
+# Constants
 TERMINOLOGY_CODING_SYS = "http://terminology.hl7.org/CodeSystem/v2-0203"
 TERMINOLOGY_CODING_SYS_CODE_ACCESSION = "ACSN"
 TERMINOLOGY_CODING_SYS_CODE_MRN = "MR"
 
 ACQUISITION_MODALITY_SYS = "http://dicom.nema.org/resources/ontology/DCM"
-
 ACSN_IDENTIFIER_SYSTEM_PREFIX = "http://sys-ids.kemkes.go.id/acsn/"
+SOP_CLASS_SYS = "urn:ietf:rfc:3986"
 
-SOP_CLASS_SYS ="urn:ietf:rfc:3986"
-
+# Load configuration
 config = configparser.ConfigParser()
 config.read('router.conf')
 tz_name = config.get('satusehat', 'tz_name')
 organization_id = config.get('satusehat', 'organization_id')
 
-def gen_accession_identifier(id):
-    idf = identifier.Identifier()
-    idf.use="usual"
-    idf.type =codeableconcept.CodeableConcept()
-    idf.type.coding = []
-    acsn = coding.Coding()
-    acsn.system=TERMINOLOGY_CODING_SYS
-    acsn.code=TERMINOLOGY_CODING_SYS_CODE_ACCESSION
 
-    idf.type.coding.append(acsn)
-    idf.value=id
-    idf.system = ACSN_IDENTIFIER_SYSTEM_PREFIX + organization_id
-    return idf
-
-def gen_studyinstanceuid_identifier(id):
-    idf = identifier.Identifier()
-    idf.system="urn:dicom:uid"
-    idf.value="urn:oid:" + id
-    return idf
-
-def getPatientResourceIdentifications(PatientID, IssuerOfPatientID):
+def gen_accession_identifier(id: str) -> identifier.Identifier:
+    """Generate an accession identifier."""
     idf = identifier.Identifier()
     idf.use = "usual"
-    idf.type = codeableconcept.CodeableConcept()
-    idf.type.coding = []
-    pid = coding.Coding()
-    pid.system = TERMINOLOGY_CODING_SYS
-    pid.code = TERMINOLOGY_CODING_SYS_CODE_MRN
-    idf.type.coding.append(pid)
+    idf.type = codeableconcept.CodeableConcept(coding=[coding.Coding(system=TERMINOLOGY_CODING_SYS, code=TERMINOLOGY_CODING_SYS_CODE_ACCESSION)])
+    idf.value = id
+    idf.system = f"{ACSN_IDENTIFIER_SYSTEM_PREFIX}{organization_id}"
+    return idf
 
-    idf.system = "urn:oid:" + IssuerOfPatientID
+
+def gen_studyinstanceuid_identifier(id: str) -> identifier.Identifier:
+    """Generate a StudyInstanceUID identifier."""
+    return identifier.Identifier(system="urn:dicom:uid", value=f"urn:oid:{id}")
+
+
+def get_patient_resource_identifications(PatientID: str, IssuerOfPatientID: str) -> identifier.Identifier:
+    """Generate patient resource identification."""
+    idf = identifier.Identifier()
+    idf.use = "usual"
+    idf.type = codeableconcept.CodeableConcept(coding=[coding.Coding(system=TERMINOLOGY_CODING_SYS, code=TERMINOLOGY_CODING_SYS_CODE_MRN)])
+    idf.system = f"urn:oid:{IssuerOfPatientID}"
     idf.value = PatientID
     return idf
 
 
-def calc_gender(gender):
-    if gender is None:
+def calc_gender(gender: str) -> str:
+    """Convert gender code to FHIR-compatible value."""
+    if gender is None or not gender:
         return "unknown"
-    if not gender:
-        return "unknown"
-    if gender.upper().lower() == "f":
-        return "female"
-    if gender.upper().lower() == "m":
-        return "male"
-    if gender.upper().lower() == "o":
-        return "other"
-
-    return "unknown"
+    gender = gender.lower()
+    return {"f": "female", "m": "male", "o": "other"}.get(gender, "unknown")
 
 
-def calc_dob(dicom_dob):
-    if dicom_dob == '':
+def calc_dob(dicom_dob: str) -> fhirtypes.Date:
+    """Convert DICOM date of birth to FHIR format."""
+    if not dicom_dob:
         return None
-
-    fhir_dob = fhirtypes.Date() # fhirdate.FHIRDate()
     try:
         dob = datetime.strptime(dicom_dob, '%Y%m%d')
-        fhir_dob.date = dob
-    except:
+        return fhirtypes.Date(dob)
+    except ValueError:
         return None
-    return fhir_dob
 
-def inline_patient_resource(referenceId, PatientID, IssuerOfPatientID, patientName,gender, dob):
+
+def inline_patient_resource(reference_id: str, PatientID: str, IssuerOfPatientID: str, patient_name, gender: str, dob: str) -> patient.Patient:
+    """Generate inline FHIR Patient resource."""
     p = patient.Patient()
-    p.id=referenceId
-    p.name =[]
-    p.use = "official"
-    p.identifier= [getPatientResourceIdentifications(PatientID,IssuerOfPatientID)]
-    hn=humanname.HumanName()
-    hn.family= patientName.family_name
-    hn.given = [patientName.given_name]
-    p.name.append(hn)
-    p.gender= calc_gender(gender)
-    p.birthDate =calc_dob(dob)
-    p.active=True
+    p.id = reference_id
+    p.identifier = [get_patient_resource_identifications(PatientID, IssuerOfPatientID)]
+    hn = humanname.HumanName(family=patient_name.family_name, given=[patient_name.given_name])
+    p.name = [hn]
+    p.gender = calc_gender(gender)
+    p.birthDate = calc_dob(dob)
+    p.active = True
     return p
 
-def gen_procedurecode_array(procedures):
-    if procedures is None:
+
+def gen_procedurecode_array(procedures: list) -> list:
+    """Generate an array of FHIR procedure codes."""
+    if not procedures:
         return None
+
     fhir_proc = []
     for p in procedures:
-        concept = codeableconcept.CodeableConcept()
-        c = coding.Coding()
-        c.system = p["system"]
-        c.code = p["code"]
-        c.display = p["display"]
-        concept.coding =[]
-        concept.coding.append(c)
-        concept.text=p["display"]
+        concept = codeableconcept.CodeableConcept(coding=[coding.Coding(system=p["system"], code=p["code"], display=p["display"])])
+        concept.text = p["display"]
         fhir_proc.append(concept)
-    if len(fhir_proc) > 0:
-        return fhir_proc
-    return None
+
+    return fhir_proc if fhir_proc else None
 
 
-def gen_started_datetime(dt, tm):
-
-
-    if dt is None:
+def gen_started_datetime(dt: str, tm: str) -> fhirtypes.DateTime:
+    """Generate FHIR DateTime from DICOM date and time."""
+    if not dt:
         return None
-    dttm =  datetime.strptime(dt, '%Y%m%d')
-    fhirDtm = fhirtypes.DateTime(year=dttm.year,month=dttm.month,day=dttm.day)
-    if tm is None or len(tm) < 6:
-        return fhirDtm
-    fhirtime = datetime.strptime(tm[0:6], '%H%M%S')
-    localtz = pytz.timezone(tz_name)
-    locatime = datetime.now(localtz)
+    dttm = datetime.strptime(dt, '%Y%m%d')
+    fhir_dtm = fhirtypes.DateTime(year=dttm.year, month=dttm.month, day=dttm.day)
 
-    fhirDtm = fhirtypes.DateTime(year=dttm.year,month=dttm.month,day=dttm.day, hour=fhirtime.hour, minute=fhirtime.minute, second=fhirtime.second, tzinfo=locatime.tzinfo)
-    return fhirDtm
+    if tm and len(tm) >= 6:
+        fhirtime = datetime.strptime(tm[:6], '%H%M%S')
+        local_tz = pytz.timezone(tz_name)
+        local_time = datetime.now(local_tz)
+        fhir_dtm = fhirtypes.DateTime(
+            year=dttm.year, month=dttm.month, day=dttm.day,
+            hour=fhirtime.hour, minute=fhirtime.minute, second=fhirtime.second,
+            tzinfo=local_time.tzinfo
+        )
+    return fhir_dtm
 
 
-def gen_reason(reason, reasonStr):
-    if reason is None and reasonStr is None:
+def gen_reason(reason: list, reason_str: str) -> list:
+    """Generate FHIR reason code."""
+    if not reason and not reason_str:
         return None
-    reasonList = []
-    if reason is None or len(reason) <= 0:
-        rc = codeableconcept.CodeableConcept()
-        rc.text=reasonStr
-        reasonList.append(rc)
-        return reasonList
+
+    reason_list = []
+    if not reason:
+        rc = codeableconcept.CodeableConcept(text=reason_str)
+        reason_list.append(rc)
+        return reason_list
 
     for r in reason:
-        rc = codeableconcept.CodeableConcept()
-        rc.coding = []
-        c = coding.Coding()
-        c.system = r["system"]
-        c.code =r ["code"]
-        c.display = r["display"]
-        rc.coding.append(c)
-        reasonList.append(rc)
-    return reasonList
+        rc = codeableconcept.CodeableConcept(
+            coding=[coding.Coding(system=r["system"], code=r["code"], display=r["display"])]
+        )
+        reason_list.append(rc)
+
+    return reason_list
 
 
-def gen_modality_coding(mod):
-    c = coding.Coding()
-    c.system = ACQUISITION_MODALITY_SYS
-    c.code = mod
-    return c
+def gen_modality_coding(mod: str) -> coding.Coding:
+    """Generate modality coding."""
+    return coding.Coding(system=ACQUISITION_MODALITY_SYS, code=mod)
 
 
 def update_study_modality_list(study: imagingstudy.ImagingStudy, modality: coding.Coding):
-    if study.modality is None or len(study.modality) <= 0:
-        study.modality = []
+    """Update the modality list for a study."""
+    if not study.modality:
+        study.modality = [modality]
+        return
+
+    if not any(mc.system == modality.system and mc.code == modality.code for mc in study.modality):
         study.modality.append(modality)
-        return
-
-    c = next(( mc for mc in study.modality if mc.system == modality.system and mc.code == modality.code), None)
-    if c is not None:
-        return
-
-    study.modality.append(modality)
-    return
 
 
-def gen_instance_sopclass(SOPClassUID):
-    c = coding.Coding()
-    c.system=SOP_CLASS_SYS
-    c.code = "urn:oid:" + SOPClassUID
-    return c
+def gen_instance_sopclass(SOPClassUID: str) -> coding.Coding:
+    """Generate SOP class coding."""
+    return coding.Coding(system=SOP_CLASS_SYS, code=f"urn:oid:{SOPClassUID}")
 
 
-def gen_coding_text_only(text):
-    c = coding.Coding()
-    c.code = text
-    c.userSelected = True
-    return c
+def gen_coding_text_only(text: str) -> coding.Coding:
+    """Generate coding with text only."""
+    return coding.Coding(code=text, userSelected=True)

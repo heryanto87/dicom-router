@@ -1,34 +1,57 @@
 import configparser
 import requests
 
+# Load configuration
 config = configparser.ConfigParser()
 config.read('router.conf')
+
 whatsapp_provider = config.get('satusehat', 'whatsapp_provider')
 halosis_email = config.get('satusehat', 'halosis_email')
 halosis_pass = config.get('satusehat', 'halosis_pass')
 
 def get_token():
-  payload = {
-    'email': halosis_email,
-    'password': halosis_pass
-  }
+    """Fetches long-lived token by logging in and requesting a refresh token."""
 
-  response = requests.post(whatsapp_provider+'/v1/login', json=payload)
+    login_url = f'{whatsapp_provider}/v1/login'
+    access_token_url = f'{whatsapp_provider}/v1/access-token'
 
-  if response.status_code == 200:
-    response_data = response.json()
-    payload = {
-      'refresh_token': response_data.get('refresh_token')
+    # Prepare payload for login request
+    login_payload = {
+        'email': halosis_email,
+        'password': halosis_pass
     }
-    response = requests.post(whatsapp_provider+'/v1/access-token', json=payload)
 
-    if response.status_code == 200:
-      response_data = response.json()
-      return {
-        "token": response_data.get('long_lived_token'),
-        "expire_at": response_data.get('token_expired_at'),
-      }
-    else:
-      print("error: ", response.status_code)
-  else:
-    print("error: ", response.status_code)
+    try:
+        # Perform login request
+        login_response = requests.post(login_url, json=login_payload)
+        login_response.raise_for_status()  # Raises an exception for 4XX/5XX status codes
+
+        response_data = login_response.json()
+        refresh_token = response_data.get('refresh_token')
+
+        if not refresh_token:
+            raise ValueError("No refresh token found in the login response.")
+
+        # Prepare payload for access token request
+        token_payload = {'refresh_token': refresh_token}
+
+        # Request long-lived token
+        token_response = requests.post(access_token_url, json=token_payload)
+        token_response.raise_for_status()  # Raises an exception for 4XX/5XX status codes
+
+        token_data = token_response.json()
+        return {
+            "token": token_data.get('long_lived_token'),
+            "expire_at": token_data.get('token_expired_at'),
+        }
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except requests.exceptions.RequestException as req_err:
+        print(f"Request error occurred: {req_err}")
+    except ValueError as val_err:
+        print(f"Value error: {val_err}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+
+    return None

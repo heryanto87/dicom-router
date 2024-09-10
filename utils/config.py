@@ -3,36 +3,43 @@ from utils import oauth2
 from interface import satusehat
 
 def init():
-  global config, url, organization_id, dicom_pathsuffix, fhir_pathsuffix, dicom_port, dcm_dir, http_port, self_ae_title, mroc_client_url, encrypt
-  global client_key, secret_key
-  global token, dcm_config
-  global flask_port, inotify_dir, mongodb_url, whatsapp_provider, pacs_db_name
+    global config, url, organization_id, dicom_pathsuffix, fhir_pathsuffix, dicom_port, dcm_dir, http_port, self_ae_title, mroc_client_url, encrypt
+    global client_key, secret_key, token, dcm_config
+    global flask_port, inotify_dir, mongodb_url, whatsapp_provider, pacs_db_name
 
-  config = configparser.ConfigParser()
-  config.read('router.conf')
-  url = config.get('satusehat', 'url')
-  organization_id = config.get('satusehat', 'organization_id')
-  dicom_pathsuffix = config.get('satusehat', 'dicom_pathsuffix')
-  fhir_pathsuffix = config.get('satusehat', 'fhir_pathsuffix')
-  self_ae_title = config.get('satusehat', 'ae_title')
-  dicom_port = int(config.get('satusehat', 'dicom_port'))
-  dcm_dir = config.get('satusehat', 'dcm_dir')
-  http_port = int(config.get('satusehat', 'http_port'))
-  client_key = config.get('satusehat', 'client_key')
-  secret_key = config.get('satusehat', 'secret_key')
-  mroc_client_url = config.get('satusehat', 'mroc_client_url')
-  token = oauth2.get_token()
-  dcm_config = satusehat.get_dcm_config(token)
+    # Load configuration file
+    config = configparser.ConfigParser()
+    config.read('router.conf')
 
-  flask_port = config.get('satusehat', 'flask_port')
-  inotify_dir = config.get('satusehat', 'inotify_dir')
-  mongodb_url = config.get('satusehat', 'mongodb_url')
-  whatsapp_provider = config.get('satusehat', 'whatsapp_provider')
-  pacs_db_name = config.get('satusehat', 'pacs_db_name')
+    # SATUSEHAT Configuration
+    url = config.get('satusehat', 'url')
+    organization_id = config.get('satusehat', 'organization_id')
+    dicom_pathsuffix = config.get('satusehat', 'dicom_pathsuffix')
+    fhir_pathsuffix = config.get('satusehat', 'fhir_pathsuffix')
+    self_ae_title = config.get('satusehat', 'ae_title')
 
-  try:
-    encrypt = dcm_config['SATUSEHAT_CLIENT_ENABLE']
-  except:
-    encrypt = False
+    # Ports and Directories
+    dicom_port = config.getint('satusehat', 'dicom_port')
+    dcm_dir = config.get('satusehat', 'dcm_dir')
+    http_port = config.getint('satusehat', 'http_port')
+    flask_port = config.getint('satusehat', 'flask_port')
+    inotify_dir = config.get('satusehat', 'inotify_dir')
 
+    # Database and External URLs
+    mongodb_url = config.get('satusehat', 'mongodb_url')
+    pacs_db_name = config.get('satusehat', 'pacs_db_name')
+    whatsapp_provider = config.get('satusehat', 'whatsapp_provider')
+    mroc_client_url = config.get('satusehat', 'mroc_client_url')
 
+    # OAuth credentials
+    client_key = config.get('satusehat', 'client_key')
+    secret_key = config.get('satusehat', 'secret_key')
+
+    # Get token using OAuth2
+    token = oauth2.get_token()
+
+    # Get DICOM configuration
+    dcm_config = satusehat.get_dcm_config(token)
+
+    # Enable encryption based on the config, default to False if key not found
+    encrypt = dcm_config.get('SATUSEHAT_CLIENT_ENABLE', False)
