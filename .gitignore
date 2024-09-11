@@ -8,3 +8,4 @@ instance.db
 __pycache__
 __init__.py
 flask_server.log
+.env
