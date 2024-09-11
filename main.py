@@ -245,3 +245,9 @@ def setup():
             loop = False
         else:
             print("Invalid option")
+
+
+if __name__ == "__main__":
+    print("[SYSTEM] Starting...")
+    setup()
+    print("[SYSTEM] Shutting down...")
