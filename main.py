@@ -22,7 +22,7 @@ from pynetdicom.sop_class import (
 
 from internal import dicom_listener, dicom_handler, http_server, whatsapp_handler
 from internal.flask_server import app
-from utils.dicom2fhir import process_dicom_2_fhir
+from utils.dicom2fhir import process_dicom_to_fhir
 from utils.dbquery import DBQuery
 from utils import config
 

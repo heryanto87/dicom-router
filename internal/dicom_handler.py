@@ -8,7 +8,7 @@ from interface import satusehat
 
 from utils.dbquery import DBQuery
 from utils.findquery import FindQuery
-from utils.dicom2fhir import process_dicom_2_fhir
+from utils.dicom2fhir import process_dicom_to_fhir
 from utils.dicomutils import make_association_id, make_hash
 
 from utils import oauth2
@@ -154,7 +154,7 @@ def handle_assoc_released(event, dcm_dir, organization_id, mroc_client_url, encr
 
             # Create ImagingStudy
             try:
-                imagingStudy = process_dicom_2_fhir(study_dir, imagingStudyID, serviceRequestID, patientID)
+                imagingStudy = process_dicom_to_fhir(study_dir, imagingStudyID, serviceRequestID, patientID)
                 output = os.path.join(study_dir, "ImagingStudy.json")
                 with open(output, 'w') as out_file:
                     out_file.write(imagingStudy.json(indent=2))
