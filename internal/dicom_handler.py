@@ -6,7 +6,7 @@ from pydicom import dcmread
 from pydicom.dataset import Dataset
 from interface import satusehat
 
-from utils.dbquery import dbquery
+from utils.dbquery import DBQuery
 from utils.findquery import findquery
 from utils.dicom2fhir import process_dicom_2_fhir
 from utils.dicomutils import make_association_id, make_hash
