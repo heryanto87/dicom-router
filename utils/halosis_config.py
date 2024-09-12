@@ -1,13 +1,10 @@
-import configparser
 import requests
+import os
 
 # Load configuration
-config = configparser.ConfigParser()
-config.read('router.conf')
-
-whatsapp_provider = config.get('satusehat', 'whatsapp_provider')
-halosis_email = config.get('satusehat', 'halosis_email')
-halosis_pass = config.get('satusehat', 'halosis_pass')
+whatsapp_provider = os.getEnv('WHATSAPP_PROVIDER')
+halosis_email = os.getEnv('HALOSIS_EMAIL')
+halosis_pass = os.getEnv('HALOSIS_PASS')
 
 def get_token():
     """Fetches long-lived token by logging in and requesting a refresh token."""

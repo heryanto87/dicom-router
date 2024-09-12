@@ -1,18 +1,15 @@
 import logging
 import requests
-import configparser
+import os
 
 # Set up logger
 LOGGER = logging.getLogger('pynetdicom')
 logging.basicConfig(level=logging.INFO)
 
 # Load configuration
-config = configparser.ConfigParser()
-config.read('router.conf')
-
-url = config.get('satusehat', 'url')
-client_key = config.get('satusehat', 'client_key')
-secret_key = config.get('satusehat', 'secret_key')
+url = os.getenv('URL')
+client_key = os.getenv('CLIENT_KEY')
+secret_key = os.getenv('SECRET_KEY')
 
 
 def get_token():

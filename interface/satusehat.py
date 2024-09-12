@@ -1,4 +1,3 @@
-import configparser
 import logging
 import os
 import requests
@@ -7,9 +6,6 @@ from utils.dbquery import DBQuery
 from utils import oauth2, halosis_config
 from utils.dicomutils import make_hash
 
-# Initialize configuration
-config = configparser.ConfigParser()
-config.read("router.conf")
 
 # Setup logging
 LOGGER = logging.getLogger("pynetdicom")
@@ -18,11 +14,11 @@ LOGGER = logging.getLogger("pynetdicom")
 dbq = DBQuery()
 
 # Configuration variables
-url = config.get("satusehat", "url")
-dicom_pathsuffix = config.get("satusehat", "dicom_pathsuffix")
-fhir_pathsuffix = config.get("satusehat", "fhir_pathsuffix")
-organization_id = config.get("satusehat", "organization_id")
-dcm_dir = config.get("satusehat", "dcm_dir")
+url = os.getenv('URL')
+dicom_pathsuffix = os.getenv('DICOM_PATHSUFFIX')
+fhir_pathsuffix = os.getenv('FHIR_PATHSUFFIX')
+organization_id = os.getenv('ORGANIZATION_ID')
+dcm_dir = os.getenv('DCM_DIR')
 
 
 def send(patientPhoneNumber, previewImage, patientName, examination, hospital, date, link):

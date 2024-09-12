@@ -1,6 +1,6 @@
-import configparser
 from datetime import datetime
 import pytz
+import os
 
 from fhir.resources import imagingstudy, identifier, codeableconcept, coding, patient, humanname, fhirtypes
 
@@ -14,11 +14,8 @@ ACSN_IDENTIFIER_SYSTEM_PREFIX = "http://sys-ids.kemkes.go.id/acsn/"
 SOP_CLASS_SYS = "urn:ietf:rfc:3986"
 
 # Load configuration
-config = configparser.ConfigParser()
-config.read('router.conf')
-tz_name = config.get('satusehat', 'tz_name')
-organization_id = config.get('satusehat', 'organization_id')
-
+tz_name = os.getenv('TZ_NAME')
+organization_id = os.getenv('ORGANIZATION_ID')
 
 def gen_accession_identifier(id: str) -> identifier.Identifier:
     """Generate an accession identifier."""

@@ -1,7 +1,7 @@
-import configparser
 import datetime
 import json
 import logging
+import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 from fhir.resources.servicerequest import ServiceRequest
@@ -10,9 +10,7 @@ from utils.dbquery import dbquery
 from utils import helper
 
 # Initialize configuration
-config = configparser.ConfigParser()
-config.read('router.conf')
-organization_id = config.get('satusehat', 'organization_id')
+organization_id = os.getenv('ORGANIZATION_ID')
 
 # Initialize logger
 LOGGER = logging.getLogger('pynetdicom')
