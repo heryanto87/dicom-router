@@ -4,6 +4,8 @@ import shutil
 import threading
 import pyinotify
 from time import sleep
+from dotenv import load_dotenv
+load_dotenv()
 
 from flask import Flask
 from pynetdicom import AE, evt, AllStoragePresentationContexts, debug_logger, StoragePresentationContexts, ALL_TRANSFER_SYNTAXES

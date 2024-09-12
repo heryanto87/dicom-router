@@ -2,6 +2,9 @@ import logging
 import requests
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Set up logger
 LOGGER = logging.getLogger('pynetdicom')
 logging.basicConfig(level=logging.INFO)

@@ -12,6 +12,9 @@ from utils import config
 import logging
 from pynetdicom.sop_class import Verification
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Initialize the configuration
 config.init()
 

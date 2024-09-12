@@ -8,6 +8,8 @@ from . import fhirutils
 config.convert_wrong_length_to_UN = True
 LOGGER = logging.getLogger('pynetdicom')
 
+from dotenv import load_dotenv
+load_dotenv()
 
 def dcm_coded_concept(CodeSequence):
     """Generate coded concept from DICOM CodeSequence."""

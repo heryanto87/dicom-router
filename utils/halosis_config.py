@@ -1,6 +1,9 @@
 import requests
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Load configuration
 whatsapp_provider = os.getenv('WHATSAPP_PROVIDER')
 halosis_email = os.getenv('HALOSIS_EMAIL')

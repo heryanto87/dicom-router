@@ -10,6 +10,9 @@ import os
 import threading
 import logging
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Initialize configuration and logger
 config.init()
 LOGGER = logging.getLogger("dicom_router_inotify")

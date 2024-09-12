@@ -2,6 +2,9 @@ import os
 from utils import oauth2
 from interface import satusehat
 
+from dotenv import load_dotenv
+load_dotenv()
+
 def init():
     global url, organization_id, dicom_pathsuffix, fhir_pathsuffix, dicom_port, dcm_dir, http_port, self_ae_title, mroc_client_url, encrypt
     global client_key, secret_key, token, dcm_config

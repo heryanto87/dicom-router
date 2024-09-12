@@ -13,6 +13,9 @@ from utils.dicomutils import make_association_id, make_hash
 
 from utils import oauth2
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Initialize logger
 LOGGER = logging.getLogger('pynetdicom')
 

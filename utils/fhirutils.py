@@ -2,6 +2,9 @@ from datetime import datetime
 import pytz
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fhir.resources import imagingstudy, identifier, codeableconcept, coding, patient, humanname, fhirtypes
 
 # Constants

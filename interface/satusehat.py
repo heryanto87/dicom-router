@@ -5,7 +5,8 @@ import requests
 from utils.dbquery import DBQuery
 from utils import oauth2, halosis_config
 from utils.dicomutils import make_hash
-
+from dotenv import load_dotenv
+load_dotenv()
 
 # Setup logging
 LOGGER = logging.getLogger("pynetdicom")

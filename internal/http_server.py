@@ -9,6 +9,9 @@ from fhir.resources.patient import Patient
 from utils.dbquery import dbquery
 from utils import helper
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Initialize configuration
 organization_id = os.getenv('ORGANIZATION_ID')
 
