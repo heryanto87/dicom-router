@@ -7,7 +7,7 @@ from pydicom.dataset import Dataset
 from interface import satusehat
 
 from utils.dbquery import DBQuery
-from utils.findquery import findquery
+from utils.findquery import FindQuery
 from utils.dicom2fhir import process_dicom_2_fhir
 from utils.dicomutils import make_association_id, make_hash
 
@@ -243,7 +243,7 @@ def build_query(identifier, session, query=None):
 def handle_find(event, logger):
     """Handles a C-FIND request event."""
     ds = event.identifier
-    fq = findquery()
+    fq = FindQuery()
     sql = fq.GenerateSql(ds)
 
     LOGGER.info(f"Generated SQL query: {sql}")
