@@ -70,7 +70,7 @@ def handle_store(event, dcm_dir, logger):
     LOGGER.info("Handling C-STORE request.")
 
     # Initialize database query instance
-    dbq = dbquery()
+    dbq = DBQuery()
 
     # Get the DICOM dataset from the event and file metadata
     ds = event.dataset
@@ -114,7 +114,7 @@ def handle_store(event, dcm_dir, logger):
 
 def handle_assoc_released(event, dcm_dir, organization_id, mroc_client_url, encrypt, logger):
     """Handles an ASSOCIATION RELEASE event."""
-    dbq = dbquery()
+    dbq = DBQuery()
     global token
     token = oauth2.get_token()
 
@@ -247,7 +247,7 @@ def handle_find(event, logger):
     sql = fq.GenerateSql(ds)
 
     LOGGER.info(f"Generated SQL query: {sql}")
-    dbq = dbquery()
+    dbq = DBQuery()
     instances = dbq.Query(sql, [])
 
     if 'QueryRetrieveLevel' not in ds:

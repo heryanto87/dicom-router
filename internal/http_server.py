@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 from fhir.resources.servicerequest import ServiceRequest
 from fhir.resources.patient import Patient
-from utils.dbquery import dbquery
+from utils.dbquery import DBQuery
 from utils import helper
 
 from dotenv import load_dotenv
@@ -74,7 +74,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
             self._set_response(404, response_body=response_templates["404"])
 
     def do_POST(self):
-        dbq_instance = dbquery()
+        dbq_instance = DBQuery()
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length).decode('utf-8')
 

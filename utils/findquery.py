@@ -1,4 +1,4 @@
-from utils.dbquery import dbquery
+from utils.dbquery import DBQuery
 from pydicom.dataset import Dataset
 from typing import List
 
