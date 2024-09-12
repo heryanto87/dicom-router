@@ -1,37 +1,40 @@
-import logging
 import os
+import logging
 import shutil
 import threading
-import pyinotify
-from time import sleep
 from dotenv import load_dotenv
 load_dotenv()
-
-from flask import Flask
-from pynetdicom import AE, evt, AllStoragePresentationContexts, debug_logger, StoragePresentationContexts, ALL_TRANSFER_SYNTAXES
-from pynetdicom.sop_class import (
-    Verification,
-    PatientRootQueryRetrieveInformationModelFind,
-    PatientRootQueryRetrieveInformationModelMove,
-    PatientRootQueryRetrieveInformationModelGet,
-    StudyRootQueryRetrieveInformationModelFind,
-    StudyRootQueryRetrieveInformationModelMove,
-    StudyRootQueryRetrieveInformationModelGet,
-    ModalityWorklistInformationFind,
-)
-
-from internal import dicom_listener, dicom_handler, http_server, whatsapp_handler
-from internal.flask_server import app
-from utils.dicom2fhir import process_dicom_to_fhir
-from utils.dbquery import DBQuery
-from utils import config
-
 
 def main_loop():
     """
     Main script logic encapsulated in a function.
     This function initializes logging, database, DICOM handlers, and servers.
     """
+
+    # ====================================================
+    # Import only when needed
+    # ====================================================
+    import pyinotify
+    from time import sleep
+    from flask import Flask
+    from pynetdicom import AE, evt, AllStoragePresentationContexts, debug_logger, StoragePresentationContexts, ALL_TRANSFER_SYNTAXES
+    from pynetdicom.sop_class import (
+        Verification,
+        PatientRootQueryRetrieveInformationModelFind,
+        PatientRootQueryRetrieveInformationModelMove,
+        PatientRootQueryRetrieveInformationModelGet,
+        StudyRootQueryRetrieveInformationModelFind,
+        StudyRootQueryRetrieveInformationModelMove,
+        StudyRootQueryRetrieveInformationModelGet,
+        ModalityWorklistInformationFind,
+    )
+
+    # Now you can import your internal modules
+    from internal import dicom_listener, dicom_handler, http_server, whatsapp_handler
+    from internal.flask_server import app
+    from utils.dicom2fhir import process_dicom_to_fhir
+    from utils.dbquery import DBQuery
+    from utils import config
 
     # ====================================================
     # Initialization
@@ -239,9 +242,9 @@ def setup():
         index = input("Select an option: ")
 
         if index == "1":
-            main_loop()  # Replace with your main script logic
+            main_loop()  # Start the main logic
         elif index == "2":
-            setup_env()
+            setup_env()  # Run the setup environment
         elif index == "0":
             loop = False
         else:
