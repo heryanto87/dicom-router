@@ -2,9 +2,9 @@ import requests
 import os
 
 # Load configuration
-whatsapp_provider = os.getEnv('WHATSAPP_PROVIDER')
-halosis_email = os.getEnv('HALOSIS_EMAIL')
-halosis_pass = os.getEnv('HALOSIS_PASS')
+whatsapp_provider = os.getenv('WHATSAPP_PROVIDER')
+halosis_email = os.getenv('HALOSIS_EMAIL')
+halosis_pass = os.getenv('HALOSIS_PASS')
 
 def get_token():
     """Fetches long-lived token by logging in and requesting a refresh token."""
