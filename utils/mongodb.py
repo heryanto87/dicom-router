@@ -17,8 +17,8 @@ def connect_mongodb(coll=None, client=None):
 		Returns:
 				Collection: A MongoDB collection object.
 		"""
-		mongodb_url = os.getenv('MONGODB_URL', config.mongodb_url)
-		db_name = os.getenv('PACS_DB_NAME', config.pacs_db_name)
+		mongodb_url = config.mongodb_url
+		db_name = config.pacs_db_name
 		if client is None:
 				client = MongoClient(mongodb_url,  tlsCAFile=certifi.where())
 
@@ -33,5 +33,5 @@ def client_mongodb():
 		Returns:
 				MongoClient: A new MongoClient connected to the MongoDB server.
 		"""
-		mongodb_url = os.getenv('MONGODB_URL', config.mongodb_url)
+		mongodb_url = config.mongodb_url
 		return MongoClient(mongodb_url, tlsCAFile=certifi.where())
