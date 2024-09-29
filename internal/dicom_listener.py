@@ -138,13 +138,16 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number, series_numbe
     if assoc.is_established:
         try:
             image_coll = connect_mongodb("image")
-            study_instances = image_coll.find({
+            query = {
                 "patient_id": patient_id,
                 "study_id": study_id,
-                "series_number": series_number,
-                "instance_number": instance_number,
                 "integration_status_satusehat": {"$ne": 1}
-            }).sort("series_number", 1)
+            }
+            if series_number is not None:
+                query["series_number"] = series_number
+            if instance_number is not None:
+                query["instance_number"] = instance_number
+            study_instances = image_coll.find(query).sort("series_number", 1)
 
             instance_list = list(study_instances)
             LOGGER.info(f"Instances found: {len(instance_list)}")
