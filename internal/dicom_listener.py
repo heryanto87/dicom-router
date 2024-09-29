@@ -133,7 +133,7 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number, series_numbe
     ae = AE(ae_title=config.self_ae_title)
     ae.add_requested_context(Verification)
 
-    assoc = ae.associate('localhost', config.dicom_port, StoragePresentationContexts, ae_title=config.self_ae_title)
+    assoc = ae.associate('localhost', config.dicom_port, AllStoragePresentationContexts, ae_title=config.self_ae_title)
 
     if assoc.is_established:
         try:
