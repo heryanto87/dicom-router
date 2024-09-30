@@ -142,15 +142,15 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number, series_numbe
 
     ae = AE(ae_title=config.self_ae_title)
 
-    transfer_syntaxes = ALL_TRANSFER_SYNTAXES
+    transfer_syntaxes = ALL_TRANSFER_SYNTAXES #  -> seems no need
 
-    for context in StoragePresentationContexts:
+    for context in StoragePresentationContexts: # -> seems no need
         ae.add_supported_context(context.abstract_syntax, transfer_syntaxes)
     
-    # Support verification SCP (echo)
+    # Support verification SCP (echo)  -> seems no need
     ae.add_requested_context(Verification)
 
-    # Query/Retrieve SCP
+    # Query/Retrieve SCP -> seems no need
     ae.add_supported_context(PatientRootQueryRetrieveInformationModelFind)
     ae.add_supported_context(PatientRootQueryRetrieveInformationModelMove)
     ae.add_supported_context(PatientRootQueryRetrieveInformationModelGet)
@@ -158,12 +158,14 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number, series_numbe
     ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
     ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
     ae.add_supported_context(ModalityWorklistInformationFind)
+
+    # Add support for Digital X-Ray Image Storage for Presentation
     ae.add_supported_context(DigitalXRayImageStorageForPresentation)
  
-    # Support presentation contexts for all storage SOP Classes
+    # Support presentation contexts for all storage SOP Classes  -> seems no need
     ae.supported_contexts = AllStoragePresentationContexts
 
-    # Set to require the *Called AE Title* must match the AE title
+    # Set to require the *Called AE Title* must match the AE title  -> seems no need
     ae.require_called_aet = config.self_ae_title
 
     assoc = ae.associate('localhost', config.dicom_port, ae_title=config.self_ae_title)
