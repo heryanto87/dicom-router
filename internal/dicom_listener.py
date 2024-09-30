@@ -19,6 +19,7 @@ from pynetdicom.sop_class import (
     StudyRootQueryRetrieveInformationModelMove,
     StudyRootQueryRetrieveInformationModelGet,
     ModalityWorklistInformationFind,
+    DigitalXRayImageStorageForPresentation
 )
 
 from dotenv import load_dotenv
@@ -157,7 +158,8 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number, series_numbe
     ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
     ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
     ae.add_supported_context(ModalityWorklistInformationFind)
-
+    ae.add_supported_context(DigitalXRayImageStorageForPresentation)
+ 
     # Support presentation contexts for all storage SOP Classes
     ae.supported_contexts = AllStoragePresentationContexts
 
