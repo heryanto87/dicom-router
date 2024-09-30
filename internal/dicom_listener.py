@@ -10,7 +10,16 @@ from pymongo.errors import OperationFailure
 from datetime import datetime
 from utils import config
 import logging
-from pynetdicom.sop_class import Verification
+from pynetdicom.sop_class import (
+    Verification,
+    PatientRootQueryRetrieveInformationModelFind,
+    PatientRootQueryRetrieveInformationModelMove,
+    PatientRootQueryRetrieveInformationModelGet,
+    StudyRootQueryRetrieveInformationModelFind,
+    StudyRootQueryRetrieveInformationModelMove,
+    StudyRootQueryRetrieveInformationModelGet,
+    ModalityWorklistInformationFind,
+)
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -131,9 +140,31 @@ def dicom_to_satusehat_task(patient_id, study_id, accession_number, series_numbe
     LOGGER.info("Processing to Satusehat Task")
 
     ae = AE(ae_title=config.self_ae_title)
+
+    transfer_syntaxes = ALL_TRANSFER_SYNTAXES
+
+    for context in StoragePresentationContexts:
+        ae.add_supported_context(context.abstract_syntax, transfer_syntaxes)
+    
+    # Support verification SCP (echo)
     ae.add_requested_context(Verification)
 
-    assoc = ae.associate('localhost', config.dicom_port, AllStoragePresentationContexts, ae_title=config.self_ae_title)
+    # Query/Retrieve SCP
+    ae.add_supported_context(PatientRootQueryRetrieveInformationModelFind)
+    ae.add_supported_context(PatientRootQueryRetrieveInformationModelMove)
+    ae.add_supported_context(PatientRootQueryRetrieveInformationModelGet)
+    ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
+    ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
+    ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
+    ae.add_supported_context(ModalityWorklistInformationFind)
+
+    # Support presentation contexts for all storage SOP Classes
+    ae.supported_contexts = AllStoragePresentationContexts
+
+    # Set to require the *Called AE Title* must match the AE title
+    ae.require_called_aet = config.self_ae_title
+
+    assoc = ae.associate('localhost', config.dicom_port, ae_title=config.self_ae_title)
 
     if assoc.is_established:
         try:
